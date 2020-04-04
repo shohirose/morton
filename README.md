@@ -9,22 +9,71 @@ Please include `morton/morthon.hpp`. If `__BMI2__` or `__AVX2__` macro is define
 
 ```cpp
 namespace morton {
-    // 32/64 bits encoding in two dimensions.
-    uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y);
-    uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y);
-    
-    // 32/64 bits decoding in two dimensions.
-    void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y);
-    void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y);
 
-    // 32/64 bits encoding in three dimensions.
-    uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y, const uint_fast16_t z);
-    uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y, const uint_fast32_t z);
+// 32/64 bits encoding in two dimensions.
+uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y);
+uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y);
 
-    // 32/64 bits decoding in three dimensions.
-    void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, const uint_fast16_t z);
-    void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, const uint_fast32_t z);
+// 32/64 bits decoding in two dimensions.
+void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y);
+void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y);
+
+// 32/64 bits encoding in three dimensions.
+uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y, const uint_fast16_t z);
+uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y, const uint_fast32_t z);
+
+// 32/64 bits decoding in three dimensions.
+void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, const uint_fast16_t z);
+void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, const uint_fast32_t z);
+
 }
+```
+
+If you want to use a specific encoding/decoding implementation, you can specify the implementation using tags. A tag type must be either of the followings:
+
+- `morton::tag::bmi`: Implementation using BMI instruction sets.
+- `morton::tag::lookup_table`: Implementation using look-up tables.
+- `morton::tag::preshifted_lookup_table`: Implementation using pre-shifted look-up tables.
+
+```cpp
+namespace morton {
+
+// 32/64 bits encoding in two dimensions.
+template <typename Tag>
+uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y, Tag tag);
+template <typename Tag>
+uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y, Tag tag);
+
+// 32/64 bits decoding in two dimensions.
+template <typename Tag>
+void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, Tag tag);
+template <typename Tag>
+void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, Tag tag);
+
+// 32/64 bits encoding in three dimensions.
+template <typename Tag>
+uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y, const uint_fast16_t z, Tag tag);
+template <typename Tag>
+uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y, const uint_fast32_t z, Tag tag);
+
+// 32/64 bits decoding in three dimensions.
+template <typename Tag>
+void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, const uint_fast16_t z, Tag tag);
+template <typename Tag>
+void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, const uint_fast32_t z, Tag tag);
+
+}
+```
+
+Using the above functions, you can do like:
+
+```cpp
+using morton::encode;
+namespace tag = morton::tag;
+
+const uint_fast16_t x = // ...
+const uint_fast16_t y = // ...
+const auto m = encode(x, y, tag::preshifted_lookup_table{});
 ```
 
 ## Testing

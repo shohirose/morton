@@ -342,10 +342,9 @@ class morton2d {
   /// Helper function for decode
   /// @param[in] m Morton code
   /// @param[in] table Look-up table
-  /// @param[in] shift Bit-shift value
   /// @returns Coordinate
-  static Coordinate decode(const MortonCode m, const uint_fast8_t* table,
-                           const unsigned int shift) noexcept;
+  static Coordinate decode(const MortonCode m,
+                           const uint_fast8_t* table) noexcept;
 };
 
 template <typename MortonCode, typename Coordinate>
@@ -365,14 +364,13 @@ inline MortonCode morton2d<MortonCode, Coordinate>::encode(
 
 template <typename MortonCode, typename Coordinate>
 inline Coordinate morton2d<MortonCode, Coordinate>::decode(
-    const MortonCode m, const uint_fast8_t* table,
-    const unsigned int shift) noexcept {
+    const MortonCode m, const uint_fast8_t* table) noexcept {
   MortonCode code = 0;
   // 8-bit mask
   constexpr MortonCode mask = 0x000000FF;
   for (unsigned int i = 0; i < sizeof(MortonCode); ++i) {
-    code |= static_cast<MortonCode>(table[(m >> ((i * 8) + shift)) & mask]
-                                    << (4 * i));
+    const unsigned int shift = i * 8;
+    code |= static_cast<MortonCode>(table[(m >> shift) & mask] << (4 * i));
   }
   return static_cast<Coordinate>(code);
 }
@@ -380,8 +378,8 @@ inline Coordinate morton2d<MortonCode, Coordinate>::decode(
 template <typename MortonCode, typename Coordinate>
 inline void morton2d<MortonCode, Coordinate>::decode(  //
     const MortonCode m, Coordinate& x, Coordinate& y) noexcept {
-  x = decode(m, lookup_table::decode2d::x, 0);
-  y = decode(m, lookup_table::decode2d::y, 0);
+  x = decode(m, lookup_table::decode2d::x);
+  y = decode(m, lookup_table::decode2d::y);
 }
 
 }  // namespace detail
@@ -434,10 +432,9 @@ class morton3d {
   /// Helper function for decode
   /// @param[in] m Morton code
   /// @param[in] table Look-up table
-  /// @param[in] shift Bit-shift value
   /// @returns Coordinate
-  static Coordinate decode(const MortonCode m, const uint_fast8_t* table,
-                           const unsigned int shift) noexcept;
+  static Coordinate decode(const MortonCode m,
+                           const uint_fast8_t* table) noexcept;
 };
 
 template <typename MortonCode, typename Coordinate>
@@ -457,15 +454,15 @@ inline MortonCode morton3d<MortonCode, Coordinate>::encode(
 
 template <typename MortonCode, typename Coordinate>
 inline Coordinate morton3d<MortonCode, Coordinate>::decode(
-    const MortonCode m, const uint_fast8_t* table,
-    const unsigned int shift) noexcept {
+    const MortonCode m, const uint_fast8_t* table) noexcept {
   MortonCode code = 0;
   // ceil for 32bit, floor for 64bit
   const unsigned int loops = (sizeof(MortonCode) <= 4) ? 4 : 7;
   // 9-bit mask
   constexpr MortonCode mask = 0x000001FF;
   for (unsigned int i = 0; i < loops; ++i) {
-    code |= static_cast<MortonCode>(table[(m >> ((i * 9) + shift)) & mask]
+    const unsigned int shift = i * 9;
+    code |= static_cast<MortonCode>(table[(m >> shift) & mask]
                                     << MortonCode(3 * i));
   }
   return static_cast<Coordinate>(code);
@@ -476,9 +473,9 @@ inline void morton3d<MortonCode, Coordinate>::decode(const MortonCode m,
                                                      Coordinate& x,
                                                      Coordinate& y,
                                                      Coordinate& z) noexcept {
-  x = decode(m, lookup_table::decode3d::x, 0);
-  y = decode(m, lookup_table::decode3d::y, 0);
-  z = decode(m, lookup_table::decode3d::z, 0);
+  x = decode(m, lookup_table::decode3d::x);
+  y = decode(m, lookup_table::decode3d::y);
+  z = decode(m, lookup_table::decode3d::z);
 }
 
 }  // namespace detail

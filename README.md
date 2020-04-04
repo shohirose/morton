@@ -11,7 +11,7 @@ in `libmorton` are implemented here for self-learning.　Unit tests are created 
 
 ## Usage
 
-Please include `morton/morthon.hpp`. If `__BMI2__` or `__AVX2__` macro is defined, `encode`/`decode` functions use BMI instruction sets.
+Please include `morton/morton.hpp`. If `__BMI2__` or `__AVX2__` macro is defined, `encode`/`decode` functions use BMI instruction sets.
 
 ```cpp
 namespace morton {

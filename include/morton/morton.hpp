@@ -21,6 +21,9 @@ namespace tag {
 /// Tag for the implementation using pre-shifted look-up table
 struct preshifted_lookup_table {};
 
+/// Tag for the implementation using look-up table
+struct lookup_table {};
+
 /// Tag for the implementation using BMI instructions
 struct bmi {};
 
@@ -415,6 +418,70 @@ morton2d<MortonCode, Coordinate, tag::preshifted_lookup_table>::decode(  //
   y = decode(m, lookup_table::decode2d::y);
 }
 
+/// @brief Morton code implementation using look-up tables in two dimensions.
+/// @tparam MortonCode Morton code
+/// @tparam Coordinate Coordinate
+template <typename MortonCode, typename Coordinate>
+class morton2d<MortonCode, Coordinate, tag::lookup_table> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] x X coordinate
+  /// @param[in] y Y coordinate
+  /// @returns Moton code
+  static MortonCode encode(const Coordinate x, const Coordinate y) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @param[out] x X coordinate
+  /// @param[out] y Y coordinate
+  static void decode(const MortonCode m, Coordinate& x, Coordinate& y) noexcept;
+
+ private:
+  /// Helper function for decode
+  /// @param[in] m Morton code
+  /// @param[in] table Look-up table
+  /// @param[in] shift0 Start shift
+  /// @returns Coordinate
+  static Coordinate decode(const MortonCode m, const uint_fast8_t* table,
+                           const unsigned int shift0) noexcept;
+};
+
+template <typename MortonCode, typename Coordinate>
+inline MortonCode morton2d<MortonCode, Coordinate, tag::lookup_table>::encode(
+    const Coordinate x, const Coordinate y) noexcept {
+  MortonCode code = 0;
+  // 8-bit mask
+  constexpr MortonCode mask = 0x000000FF;
+  for (unsigned int i = sizeof(Coordinate); i > 0; --i) {
+    const unsigned int shift = (i - 1) * 8;
+    code = code << 16 |  //
+           (lookup_table::encode2d::x[(y >> shift) & mask] << MortonCode(1)) |
+           lookup_table::encode2d::x[(x >> shift) & mask];
+  }
+  return code;
+}
+
+template <typename MortonCode, typename Coordinate>
+inline Coordinate morton2d<MortonCode, Coordinate, tag::lookup_table>::decode(
+    const MortonCode m, const uint_fast8_t* table,
+    const unsigned int shift0) noexcept {
+  MortonCode code = 0;
+  // 8-bit mask
+  constexpr MortonCode mask = 0x000000FF;
+  for (unsigned int i = 0; i < sizeof(MortonCode); ++i) {
+    const unsigned int shift = i * 8 + shift0;
+    code |= static_cast<MortonCode>(table[(m >> shift) & mask] << (4 * i));
+  }
+  return static_cast<Coordinate>(code);
+}
+
+template <typename MortonCode, typename Coordinate>
+inline void morton2d<MortonCode, Coordinate, tag::lookup_table>::decode(  //
+    const MortonCode m, Coordinate& x, Coordinate& y) noexcept {
+  x = decode(m, lookup_table::decode2d::x, 0);
+  y = decode(m, lookup_table::decode2d::x, 1);
+}
+
 #ifdef MORTON_USE_BMI
 
 inline uint32_t pdep(uint32_t source, uint32_t mask) noexcept {
@@ -652,6 +719,79 @@ morton3d<MortonCode, Coordinate, tag::preshifted_lookup_table>::decode(
   x = decode(m, lookup_table::decode3d::x);
   y = decode(m, lookup_table::decode3d::y);
   z = decode(m, lookup_table::decode3d::z);
+}
+
+/// @brief Morton code implementation using look-up tables in three dimensions.
+/// @tparam MortonCode Morton code
+/// @tparam Coordinate Coordinate
+template <typename MortonCode, typename Coordinate>
+class morton3d<MortonCode, Coordinate, tag::lookup_table> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] x X coordinate
+  /// @param[in] y Y coordinate
+  /// @param[in] z Z coordinate
+  /// @returns Moton code
+  static MortonCode encode(const Coordinate x, const Coordinate y,
+                           const Coordinate z) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @param[out] x X coordinate
+  /// @param[out] y Y coordinate
+  /// @param[out] z Z coordinate
+  static void decode(const MortonCode m, Coordinate& x, Coordinate& y,
+                     Coordinate& z) noexcept;
+
+ private:
+  /// Helper function for decode
+  /// @param[in] m Morton code
+  /// @param[in] table Look-up table
+  /// @param[in] shift0 Start shift
+  /// @returns Coordinate
+  static Coordinate decode(const MortonCode m, const uint_fast8_t* table,
+                           const unsigned int shift0) noexcept;
+};
+
+template <typename MortonCode, typename Coordinate>
+inline MortonCode morton3d<MortonCode, Coordinate, tag::lookup_table>::encode(
+    const Coordinate x, const Coordinate y, const Coordinate z) noexcept {
+  MortonCode code = 0;
+  // 8-bit mask
+  constexpr MortonCode mask = 0x000000FF;
+  for (unsigned int i = sizeof(Coordinate); i > 0; --i) {
+    unsigned int shift = (i - 1) * 8;
+    code = code << 24 |
+           ((lookup_table::encode3d::x[(z >> shift) & mask] << MortonCode(2)) |
+            (lookup_table::encode3d::x[(y >> shift) & mask] << MortonCode(1)) |
+            lookup_table::encode3d::x[(x >> shift) & mask]);
+  }
+  return code;
+}
+
+template <typename MortonCode, typename Coordinate>
+inline Coordinate morton3d<MortonCode, Coordinate, tag::lookup_table>::decode(
+    const MortonCode m, const uint_fast8_t* table,
+    const unsigned int shift0) noexcept {
+  MortonCode code = 0;
+  // ceil for 32bit, floor for 64bit
+  const unsigned int loops = (sizeof(MortonCode) <= 4) ? 4 : 7;
+  // 9-bit mask
+  constexpr MortonCode mask = 0x000001FF;
+  for (unsigned int i = 0; i < loops; ++i) {
+    const unsigned int shift = i * 9 + shift0;
+    code |= static_cast<MortonCode>(table[(m >> shift) & mask]
+                                    << MortonCode(3 * i));
+  }
+  return static_cast<Coordinate>(code);
+}
+
+template <typename MortonCode, typename Coordinate>
+inline void morton3d<MortonCode, Coordinate, tag::lookup_table>::decode(
+    const MortonCode m, Coordinate& x, Coordinate& y, Coordinate& z) noexcept {
+  x = decode(m, lookup_table::decode3d::x, 0);
+  y = decode(m, lookup_table::decode3d::x, 1);
+  z = decode(m, lookup_table::decode3d::x, 2);
 }
 
 #ifdef MORTON_USE_BMI

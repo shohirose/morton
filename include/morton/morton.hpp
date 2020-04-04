@@ -334,12 +334,18 @@ static const uint_fast8_t z[512] = {
 /// Tags for partial specialization of morton2d and morton3d classes.
 namespace tag {
 
+/// Tag for the implementation using pre-shifted look-up table
 struct preshifted_lookup_table {};
 
+/// Tag for the implementation using BMI instructions
 struct bmi {};
 
 }  // namespace tag
 
+/// @brief Morton code implementation in two dimensions.
+/// @tparam MortonCode Morton code
+/// @tparam Coordinate Coordinate
+/// @tparam Tag Tag to switch implementations
 template <typename MortonCode, typename Coordinate, typename Tag>
 struct morton2d {};
 
@@ -531,6 +537,10 @@ inline void decode(const uint_fast64_t m, uint_fast32_t& x,
 
 namespace detail {
 
+/// @brief Morton code implementation in three dimensions.
+/// @tparam MortonCode Morton code
+/// @tparam Coordinate Coordinate
+/// @tparam Tag Tag to switch implementations
 template <typename MortonCode, typename Coordinate, typename Tag>
 class morton3d {};
 

@@ -8,17 +8,23 @@ This is a modified version of [`libmorton`](https://github.com/Forceflow/libmort
 Please include `morton/morthon.hpp`. If `__BMI2__` or `__AVX2__` macro is defined, `encode`/`decode` functions use BMI instruction sets.
 
 ```cpp
-// 32/64 bits encoding/decoding in two dimensions.
-uint_fast32_t morton::encode(const uint_fast16_t x, const uint_fast16_t y);
-void morton::decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y);
-uint_fast64_t morton::encode(const uint_fast32_t x, const uint_fast32_t y);
-void morton::decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y);
+namespace morton {
+    // 32/64 bits encoding in two dimensions.
+    uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y);
+    uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y);
+    
+    // 32/64 bits decoding in two dimensions.
+    void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y);
+    void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y);
 
-// 32/64 bits encoding/decoding in three dimensions.
-uint_fast32_t morton::encode(const uint_fast16_t x, const uint_fast16_t y, const uint_fast16_t z);
-void morton::decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, const uint_fast16_t z);
-uint_fast64_t morton::encode(const uint_fast32_t x, const uint_fast32_t y, const uint_fast32_t z);
-void morton::decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, const uint_fast32_t z);
+    // 32/64 bits encoding in three dimensions.
+    uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y, const uint_fast16_t z);
+    uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y, const uint_fast32_t z);
+
+    // 32/64 bits decoding in three dimensions.
+    void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, const uint_fast16_t z);
+    void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, const uint_fast32_t z);
+}
 ```
 
 ## Testing

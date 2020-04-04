@@ -1,7 +1,13 @@
 # Morton
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
 
-This is a modified version of [`libmorton`](https://github.com/Forceflow/libmorton) originally created by [@Forceflow](https://github.com/Forceflow). Encoding and decoding morton codes using pre-shifted look-up tables or using BMI instruction sets in `libmorton` are implemented here for self-learning.　Unit tests are created by using [Google Test](https://github.com/google/googletest).
+This is a modified version of [`libmorton`](https://github.com/Forceflow/libmorton) originally created by [@Forceflow](https://github.com/Forceflow). Encoding and decoding morton codes using 
+
+- Look-up tables
+- Pre-shifted look-up tables
+- BMI instruction sets
+
+in `libmorton` are implemented here for self-learning.　Unit tests are created by using [Google Test](https://github.com/google/googletest).
 
 ## Usage
 

@@ -837,9 +837,9 @@ inline void morton3d<MortonCode, Coordinate, tag::bmi>::decode(
   constexpr MortonCode mask_x = 0x9249249249249249;
   constexpr MortonCode mask_y = 0x2492492492492492;
   constexpr MortonCode mask_z = 0x4924924924924924;
-  x = static_cast<coord>(bmi2_detail::pext(m, mask_x));
-  y = static_cast<coord>(bmi2_detail::pext(m, mask_y));
-  z = static_cast<coord>(bmi2_detail::pext(m, mask_z));
+  x = static_cast<coord>(pext(m, mask_x));
+  y = static_cast<coord>(pext(m, mask_y));
+  z = static_cast<coord>(pext(m, mask_z));
 }
 
 #endif  // MORTON_USE_BMI

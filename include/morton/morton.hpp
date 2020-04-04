@@ -386,13 +386,13 @@ inline void morton2d<MortonCode, Coordinate>::decode(  //
 
 }  // namespace detail
 
-inline uint_least32_t encode(const uint_fast16_t x,
-                             const uint_fast16_t y) noexcept {
+inline uint_fast32_t encode(const uint_fast16_t x,
+                            const uint_fast16_t y) noexcept {
   return detail::morton2d<uint_fast32_t, uint_fast16_t>::encode(x, y);
 }
 
-inline uint_least64_t encode(const uint_fast32_t x,
-                             const uint_fast32_t y) noexcept {
+inline uint_fast64_t encode(const uint_fast32_t x,
+                            const uint_fast32_t y) noexcept {
   return detail::morton2d<uint_fast64_t, uint_fast32_t>::encode(x, y);
 }
 
@@ -488,8 +488,8 @@ inline void morton3d<MortonCode, Coordinate>::decode(const MortonCode m,
 /// @param[in] y Y coordinate
 /// @param[in] z Z coordinate
 /// @returns Morton code
-inline uint_least32_t encode(const uint_fast16_t x, const uint_fast16_t y,
-                             const uint_fast16_t z) noexcept {
+inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
+                            const uint_fast16_t z) noexcept {
   return detail::morton3d<uint_fast32_t, uint_fast16_t>::encode(x, y, z);
 }
 
@@ -498,8 +498,8 @@ inline uint_least32_t encode(const uint_fast16_t x, const uint_fast16_t y,
 /// @param[in] y Y coordinate
 /// @param[in] z Z coordinate
 /// @returns Morton code
-inline uint_least64_t encode(const uint_fast32_t x, const uint_fast32_t y,
-                             const uint_fast32_t z) noexcept {
+inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
+                            const uint_fast32_t z) noexcept {
   return detail::morton3d<uint_fast64_t, uint_fast32_t>::encode(x, y, z);
 }
 

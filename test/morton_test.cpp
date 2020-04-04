@@ -2,25 +2,11 @@
 
 #include <gtest/gtest.h>
 
-class Morton2dTest : public ::testing::Test {
+class Morton2d32BitTest : public ::testing::Test {
  protected:
-  const uint_least16_t x16_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_least16_t y16_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_least32_t m32_[64] = {
-      // x = 0, 1, ..., 7
-      0,  1,  4,  5,  16, 17, 20, 21,  // y = 0
-      2,  3,  6,  7,  18, 19, 22, 23,  //
-      8,  9,  12, 13, 24, 25, 28, 29,  //
-      10, 11, 14, 15, 26, 27, 30, 31,  //
-      32, 33, 36, 37, 48, 49, 52, 53,  //
-      34, 35, 38, 39, 50, 51, 54, 55,  //
-      40, 41, 44, 45, 56, 57, 60, 61,  //
-      42, 43, 46, 47, 58, 59, 62, 63   // y = 7
-  };
-
-  const uint_least32_t x32_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_least32_t y32_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_least64_t m64_[64] = {
+  const uint_fast16_t x_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint_fast16_t y_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint_fast32_t m_[64] = {
       // x = 0, 1, ..., 7
       0,  1,  4,  5,  16, 17, 20, 21,  // y = 0
       2,  3,  6,  7,  18, 19, 22, 23,  //
@@ -33,89 +19,75 @@ class Morton2dTest : public ::testing::Test {
   };
 };
 
-TEST_F(Morton2dTest, Encoding32Bit) {
+TEST_F(Morton2d32BitTest, Encoding) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
-      const auto m = morton::encode(x16_[j], y16_[i]);
-      EXPECT_EQ(m, m32_[i * 8 + j])
-          << "  x = " << x16_[j] << ", y = " << y16_[i] << '\n';
+      const auto m = morton::encode(x_[j], y_[i]);
+      EXPECT_EQ(m, m_[i * 8 + j])
+          << "  x = " << x_[j] << ", y = " << y_[i] << '\n';
     }
   }
 }
 
-TEST_F(Morton2dTest, Decoding32Bit) {
+TEST_F(Morton2d32BitTest, Decoding) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
-      uint_least16_t x, y;
+      uint_fast16_t x, y;
       const auto k = i * 8 + j;
-      morton::decode(m32_[k], x, y);
-      EXPECT_EQ(x, x16_[j]) << "  m = " << m32_[k] << '\n';
-      EXPECT_EQ(y, y16_[i]) << "  m = " << m32_[k] << '\n';
+      morton::decode(m_[k], x, y);
+      EXPECT_EQ(x, x_[j]) << "  m = " << m_[k] << '\n';
+      EXPECT_EQ(y, y_[i]) << "  m = " << m_[k] << '\n';
     }
   }
 }
 
-TEST_F(Morton2dTest, Encoding64Bit) {
+class Morton2d64BitTest : public ::testing::Test {
+ protected:
+  const uint_fast32_t x_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint_fast32_t y_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint_fast64_t m_[64] = {
+      // x = 0, 1, ..., 7
+      0,  1,  4,  5,  16, 17, 20, 21,  // y = 0
+      2,  3,  6,  7,  18, 19, 22, 23,  //
+      8,  9,  12, 13, 24, 25, 28, 29,  //
+      10, 11, 14, 15, 26, 27, 30, 31,  //
+      32, 33, 36, 37, 48, 49, 52, 53,  //
+      34, 35, 38, 39, 50, 51, 54, 55,  //
+      40, 41, 44, 45, 56, 57, 60, 61,  //
+      42, 43, 46, 47, 58, 59, 62, 63   // y = 7
+  };
+};
+
+TEST_F(Morton2d64BitTest, Encoding) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
-      const auto m = morton::encode(x32_[j], y32_[i]);
-      EXPECT_EQ(m, m64_[i * 8 + j])
-          << "  x = " << x32_[j] << ", y = " << y32_[i] << '\n';
+      const auto m = morton::encode(x_[j], y_[i]);
+      EXPECT_EQ(m, m_[i * 8 + j])
+          << "  x = " << x_[j] << ", y = " << y_[i] << '\n';
     }
   }
 }
 
-TEST_F(Morton2dTest, Decoding64Bit) {
+TEST_F(Morton2d64BitTest, Decoding) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
-      uint_least32_t x, y;
+      uint_fast32_t x, y;
       const auto k = i * 8 + j;
-      morton::decode(m64_[k], x, y);
-      EXPECT_EQ(x, x32_[j]) << "  m = " << m64_[k] << '\n';
-      EXPECT_EQ(y, y32_[i]) << "  m = " << m64_[k] << '\n';
+      morton::decode(m_[k], x, y);
+      EXPECT_EQ(x, x_[j]) << "  m = " << m_[k] << '\n';
+      EXPECT_EQ(y, y_[i]) << "  m = " << m_[k] << '\n';
     }
   }
 }
 
-class Morton3dTest : public ::testing::Test {
+class Morton3d32BitTest : public ::testing::Test {
  protected:
   void SetUp() override {}
 
-  const uint_least16_t x16_[4] = {0, 1, 2, 3};
-  const uint_least16_t y16_[4] = {0, 1, 2, 3};
-  const uint_least16_t z16_[4] = {0, 1, 2, 3};
-  const uint_least32_t m32_[64] = {
-      // x = 0, 1, 2, 3
-
-      // z = 0
-      0, 1, 8, 9,      // y = 0
-      2, 3, 10, 11,    //
-      16, 17, 24, 25,  //
-      18, 19, 26, 27,  // y = 3
-
-      // z = 1
-      4, 5, 12, 13,    //
-      6, 7, 14, 15,    //
-      20, 21, 28, 29,  //
-      22, 23, 30, 31,  //
-
-      // z = 2
-      32, 33, 40, 41,  //
-      34, 35, 42, 43,  //
-      48, 49, 56, 57,  //
-      50, 51, 58, 59,  //
-
-      // z = 3
-      36, 37, 44, 45,  //
-      38, 39, 46, 47,  //
-      52, 53, 60, 61,  //
-      54, 55, 62, 63   //
-  };
-
-  const uint_least32_t x32_[4] = {0, 1, 2, 3};
-  const uint_least32_t y32_[4] = {0, 1, 2, 3};
-  const uint_least32_t z32_[4] = {0, 1, 2, 3};
-  const uint_least64_t m64_[64] = {
+  const uint_fast16_t x_[4] = {0, 1, 2, 3};
+  const uint_fast16_t y_[4] = {0, 1, 2, 3};
+  const uint_fast16_t z_[4] = {0, 1, 2, 3};
+  const uint_fast32_t m_[64] = {
       // x = 0, 1, 2, 3
 
       // z = 0
@@ -144,58 +116,133 @@ class Morton3dTest : public ::testing::Test {
   };
 };
 
-TEST_F(Morton3dTest, Encoding32Bit) {
+TEST_F(Morton3d32BitTest, Encoding) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
       for (int k = 0; k < 4; ++k) {
-        const auto m = morton::encode(x16_[k], y16_[j], z16_[i]);
-        EXPECT_EQ(m, m32_[(i * 4 + j) * 4 + k])
-            << "  x = " << x16_[k] << ", y = " << y16_[j] << ", z = " << z16_[i]
+        const auto m = morton::encode(x_[k], y_[j], z_[i]);
+        EXPECT_EQ(m, m_[(i * 4 + j) * 4 + k])
+            << "  x = " << x_[k] << ", y = " << y_[j] << ", z = " << z_[i]
             << '\n';
       }
     }
   }
 }
 
-TEST_F(Morton3dTest, Decoding32Bit) {
+TEST_F(Morton3d32BitTest, Decoding) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
       for (int k = 0; k < 4; ++k) {
-        uint_least16_t x, y, z;
+        uint_fast16_t x, y, z;
         const auto l = (i * 4 + j) * 4 + k;
-        morton::decode(m32_[l], x, y, z);
-        EXPECT_EQ(x, x16_[k]) << "  m = " << m32_[l] << '\n';
-        EXPECT_EQ(y, y16_[j]) << "  m = " << m32_[l] << '\n';
-        EXPECT_EQ(z, z16_[i]) << "  m = " << m32_[l] << '\n';
+        morton::decode(m_[l], x, y, z);
+        EXPECT_EQ(x, x_[k]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(y, y_[j]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(z, z_[i]) << "  m = " << m_[l] << '\n';
       }
     }
   }
 }
 
-TEST_F(Morton3dTest, Encoding64Bit) {
+class Morton3d64BitTest : public ::testing::Test {
+ protected:
+  const uint_fast32_t x_[4] = {0, 1, 2, 3};
+  const uint_fast32_t y_[4] = {0, 1, 2, 3};
+  const uint_fast32_t z_[4] = {0, 1, 2, 3};
+  const uint_fast64_t m_[64] = {
+      // x = 0, 1, 2, 3
+
+      // z = 0
+      0, 1, 8, 9,      // y = 0
+      2, 3, 10, 11,    //
+      16, 17, 24, 25,  //
+      18, 19, 26, 27,  // y = 3
+
+      // z = 1
+      4, 5, 12, 13,    //
+      6, 7, 14, 15,    //
+      20, 21, 28, 29,  //
+      22, 23, 30, 31,  //
+
+      // z = 2
+      32, 33, 40, 41,  //
+      34, 35, 42, 43,  //
+      48, 49, 56, 57,  //
+      50, 51, 58, 59,  //
+
+      // z = 3
+      36, 37, 44, 45,  //
+      38, 39, 46, 47,  //
+      52, 53, 60, 61,  //
+      54, 55, 62, 63   //
+  };
+};
+
+TEST_F(Morton3d64BitTest, Encoding) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
       for (int k = 0; k < 4; ++k) {
-        const auto m = morton::encode(x32_[k], y32_[j], z32_[i]);
-        EXPECT_EQ(m, m64_[(i * 4 + j) * 4 + k])
-            << "  x = " << x32_[k] << ", y = " << y32_[j] << ", z = " << z32_[i]
+        const auto m = morton::encode(x_[k], y_[j], z_[i]);
+        EXPECT_EQ(m, m_[(i * 4 + j) * 4 + k])
+            << "  x = " << x_[k] << ", y = " << y_[j] << ", z = " << z_[i]
             << '\n';
       }
     }
   }
 }
 
-TEST_F(Morton3dTest, Decoding64Bit) {
+TEST_F(Morton3d64BitTest, Decoding) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
       for (int k = 0; k < 4; ++k) {
-        uint_least32_t x, y, z;
+        uint_fast32_t x, y, z;
         const auto l = (i * 4 + j) * 4 + k;
-        morton::decode(m64_[l], x, y, z);
-        EXPECT_EQ(x, x32_[k]) << "  m = " << m64_[l] << '\n';
-        EXPECT_EQ(y, y32_[j]) << "  m = " << m64_[l] << '\n';
-        EXPECT_EQ(z, z32_[i]) << "  m = " << m64_[l] << '\n';
+        morton::decode(m_[l], x, y, z);
+        EXPECT_EQ(x, x_[k]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(y, y_[j]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(z, z_[i]) << "  m = " << m_[l] << '\n';
       }
+    }
+  }
+}
+
+TEST(MortonBugReportTest, IssueNo25Case) {
+  // 32 Bits
+  {
+    const uint_fast16_t x = 1971;
+    const uint_fast16_t y = 1951;
+    const uint_fast16_t z = 975;
+    const uint_fast32_t m_correct = 4293967295;
+    const auto m = morton::encode(x, y, z);
+    EXPECT_EQ(m, m_correct);
+  }
+
+  // 64 Bits
+  {
+    const uint_fast32_t x = 1971;
+    const uint_fast32_t y = 1951;
+    const uint_fast32_t z = 975;
+    const uint_fast64_t m_correct = 4293967295;
+    const auto m = morton::encode(x, y, z);
+    EXPECT_EQ(m, m_correct);
+  }
+
+  // 64 Bits
+  {
+    const uint_fast32_t xt = 2097075;
+    const uint_fast32_t yt = 2097055;
+    const uint_fast32_t zt = 2097103;
+    const uint_fast64_t mt = 9223372036853775807;
+    {
+      const auto m = morton::encode(xt, yt, zt);
+      EXPECT_EQ(m, mt);
+    }
+    {
+      uint_fast32_t x, y, z;
+      morton::decode(mt, x, y, z);
+      EXPECT_EQ(x, xt);
+      EXPECT_EQ(y, yt);
+      EXPECT_EQ(z, zt);
     }
   }
 }

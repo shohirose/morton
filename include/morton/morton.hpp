@@ -15,6 +15,17 @@
 /// Moton namespace
 namespace morton {
 
+/// Tags for partial specialization of morton2d and morton3d classes.
+namespace tag {
+
+/// Tag for the implementation using pre-shifted look-up table
+struct preshifted_lookup_table {};
+
+/// Tag for the implementation using BMI instructions
+struct bmi {};
+
+}  // namespace tag
+
 /// Detail implementation of morton library
 namespace detail {
 
@@ -331,17 +342,6 @@ static const uint_fast8_t z[512] = {
 
 }  // namespace lookup_table
 
-/// Tags for partial specialization of morton2d and morton3d classes.
-namespace tag {
-
-/// Tag for the implementation using pre-shifted look-up table
-struct preshifted_lookup_table {};
-
-/// Tag for the implementation using BMI instructions
-struct bmi {};
-
-}  // namespace tag
-
 /// @brief Morton code implementation in two dimensions.
 /// @tparam MortonCode Morton code
 /// @tparam Coordinate Coordinate
@@ -475,63 +475,99 @@ inline void morton2d<MortonCode, Coordinate, tag::bmi>::decode(  //
 
 }  // namespace detail
 
-/// @brief Encode 2D coordinates into 32-bits morton code
+/// @brief Encode 2D coordinates into 32-bits morton code.
+/// @tparam Tag Tag to switch implementation
+/// @param[in] x X coordinate
+/// @param[in] y Y coordinate
+/// @returns Morton code
+template <typename Tag>
+inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
+                            Tag) noexcept {
+  return detail::morton2d<uint_fast32_t, uint_fast16_t, Tag>::encode(x, y);
+}
+
+/// @brief Encode 2D coordinates into 66-bits morton code.
+/// @tparam Tag Tag to switch implementation
+/// @param[in] x X coordinate
+/// @param[in] y Y coordinate
+/// @returns Morton code
+template <typename Tag>
+inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
+                            Tag) noexcept {
+  return detail::morton2d<uint_fast64_t, uint_fast32_t, Tag>::encode(x, y);
+}
+
+/// @brief Encode 2D coordinates into 32-bits morton code.
 /// @param[in] x X coordinate
 /// @param[in] y Y coordinate
 /// @returns Morton code
 inline uint_fast32_t encode(const uint_fast16_t x,
                             const uint_fast16_t y) noexcept {
 #ifdef MORTON_USE_BMI
-  return detail::morton2d<uint_fast32_t, uint_fast16_t,
-                          detail::tag::bmi>::encode(x, y);
+  return encode(x, y, tag::bmi{});
 #else
-  return detail::morton2d<uint_fast32_t, uint_fast16_t,
-                          detail::tag::preshifted_lookup_table>::encode(x, y);
+  return encode(x, y, tag::preshifted_lookup_table{});
 #endif  // MORTON_USE_BMI
 }
 
-/// @brief Encode 2D coordinates into 64-bits morton code
+/// @brief Encode 2D coordinates into 64-bits morton code.
 /// @param[in] x X coordinate
 /// @param[in] y Y coordinate
 /// @returns Morton code
 inline uint_fast64_t encode(const uint_fast32_t x,
                             const uint_fast32_t y) noexcept {
 #ifdef MORTON_USE_BMI
-  return detail::morton2d<uint_fast64_t, uint_fast32_t,
-                          detail::tag::bmi>::encode(x, y);
+  return encode(x, y, tag::bmi{});
 #else
-  return detail::morton2d<uint_fast64_t, uint_fast32_t,
-                          detail::tag::preshifted_lookup_table>::encode(x, y);
+  return encode(x, y, tag::preshifted_lookup_table{});
 #endif  // MORTON_USE_BMI
 }
 
-/// @brief Decode 32-bits morton code into 2D coordinates
+/// @brief Decode 32-bits morton code into 2D coordinates.
+/// @tparam Tag Tag to switch implementations
+/// @param[in] m Morton code
+/// @param[out] x X coordinate
+/// @param[out] y Y coordinate
+template <typename Tag>
+inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
+                   Tag) noexcept {
+  detail::morton2d<uint_fast32_t, uint_fast16_t, Tag>::decode(m, x, y);
+}
+
+/// @brief Decode 64-bits morton code into 2D coordinates.
+/// @tparam Tag Tag to switch implementations
+/// @param[in] m Morton code
+/// @param[out] x X coordinate
+/// @param[out] y Y coordinate
+template <typename Tag>
+inline void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y,
+                   Tag) noexcept {
+  detail::morton2d<uint_fast64_t, uint_fast32_t, Tag>::decode(m, x, y);
+}
+
+/// @brief Decode 32-bits morton code into 2D coordinates.
 /// @param[in] m Morton code
 /// @param[out] x X coordinate
 /// @param[out] y Y coordinate
 inline void decode(const uint_fast32_t m, uint_fast16_t& x,
                    uint_fast16_t& y) noexcept {
 #ifdef MORTON_USE_BMI
-  detail::morton2d<uint_fast32_t, uint_fast16_t, detail::tag::bmi>::decode(m, x,
-                                                                           y);
+  decode(m, x, y, tag::bmi{});
 #else
-  detail::morton2d<uint_fast32_t, uint_fast16_t,
-                   detail::tag::preshifted_lookup_table>::decode(m, x, y);
+  decode(m, x, y, tag::preshifted_lookup_table{});
 #endif  // MORTON_USE_BMI
 }
 
-/// @brief Decode 64-bits morton code into 2D coordinates
+/// @brief Decode 64-bits morton code into 2D coordinates.
 /// @param[in] m Morton code
 /// @param[out] x X coordinate
 /// @param[out] y Y coordinate
 inline void decode(const uint_fast64_t m, uint_fast32_t& x,
                    uint_fast32_t& y) noexcept {
 #ifdef MORTON_USE_BMI
-  detail::morton2d<uint_fast64_t, uint_fast32_t, detail::tag::bmi>::decode(m, x,
-                                                                           y);
+  decode(m, x, y, tag::bmi{});
 #else
-  detail::morton2d<uint_fast64_t, uint_fast32_t,
-                   detail::tag::preshifted_lookup_table>::decode(m, x, y);
+  decode(m, x, y, tag::preshifted_lookup_table{});
 #endif  // MORTON_USE_BMI
 }
 
@@ -671,15 +707,41 @@ inline void morton3d<MortonCode, Coordinate, tag::bmi>::decode(
 }  // namespace detail
 
 /// @brief Encode 3D coordinates into 32-bits morton code
+/// @tparam Tag Tag to switch implementations
+/// @param[in] x X coordinate
+/// @param[in] y Y coordinate
+/// @param[in] z Z coordinate
+/// @returns Morton code
+template <typename Tag>
+inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
+                            const uint_fast16_t z, Tag) noexcept {
+  return detail::morton3d<uint_fast32_t, uint_fast16_t, Tag>::encode(x, y, z);
+}
+
+/// @brief Encode 3D coordinates into 64-bits morton code
+/// @tparam Tag Tag to switch implementations
+/// @param[in] x X coordinate
+/// @param[in] y Y coordinate
+/// @param[in] z Z coordinate
+/// @returns Morton code
+template <typename Tag>
+inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
+                            const uint_fast32_t z, Tag) noexcept {
+  return detail::morton3d<uint_fast64_t, uint_fast32_t, Tag>::encode(x, y, z);
+}
+
+/// @brief Encode 3D coordinates into 32-bits morton code
 /// @param[in] x X coordinate
 /// @param[in] y Y coordinate
 /// @param[in] z Z coordinate
 /// @returns Morton code
 inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
                             const uint_fast16_t z) noexcept {
-  return detail::morton3d<uint_fast32_t, uint_fast16_t,
-                          detail::tag::preshifted_lookup_table>::encode(x, y,
-                                                                        z);
+#ifdef MORTON_USE_BMI
+  return encode(x, y, z, tag::bmi{});
+#else
+  return encode(x, y, z, tag::preshifted_lookup_table{});
+#endif  // MORTON_USE_BMI
 }
 
 /// @brief Encode 3D coordinates into 64bits morton code
@@ -690,13 +752,34 @@ inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
 inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
                             const uint_fast32_t z) noexcept {
 #ifdef MORTON_USE_BMI
-  return detail::morton3d<uint_fast64_t, uint_fast32_t,
-                          detail::tag::bmi>::encode(x, y, z);
+  return encode(x, y, z, tag::bmi{});
 #else
-  return detail::morton3d<uint_fast64_t, uint_fast32_t,
-                          detail::tag::preshifted_lookup_table>::encode(x, y,
-                                                                        z);
+  return encode(x, y, z, tag::preshifted_lookup_table{});
 #endif  // MORTON_USE_BMI
+}
+
+/// @brief Decode 32-bits morton code into 3D coordinates
+/// @tparam Tag Tag to switch implementation
+/// @param[in] m Morton code
+/// @param[out] x X coordinate
+/// @param[out] y Y coordinate
+/// @param[out] z Z coordinate
+template <typename Tag>
+inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
+                   uint_fast16_t& z, Tag) noexcept {
+  detail::morton3d<uint_fast32_t, uint_fast16_t, Tag>::decode(m, x, y, z);
+}
+
+/// @brief Decode 64-bits morton code into 3D coordinates
+/// @tparam Tag Tag to switch implementation
+/// @param[in] m Morton code
+/// @param[out] x X coordinate
+/// @param[out] y Y coordinate
+/// @param[out] z Z coordinate
+template <typename Tag>
+inline void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y,
+                   uint_fast32_t& z, Tag) noexcept {
+  detail::morton3d<uint_fast64_t, uint_fast32_t, Tag>::decode(m, x, y, z);
 }
 
 /// @brief Decode 32-bits morton code into 3D coordinates
@@ -707,11 +790,9 @@ inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
 inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
                    uint_fast16_t& z) noexcept {
 #ifdef MORTON_USE_BMI
-  detail::morton3d<uint_fast32_t, uint_fast16_t, detail::tag::bmi>::decode(
-      m, x, y, z);
+  decode(m, x, y, z, tag::bmi{});
 #else
-  detail::morton3d<uint_fast32_t, uint_fast16_t,
-                   detail::tag::preshifted_lookup_table>::decode(m, x, y, z);
+  decode(m, x, y, z, tag::preshifted_lookup_table{});
 #endif  // MORTON_USE_BMI
 }
 
@@ -723,11 +804,9 @@ inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
 inline void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y,
                    uint_fast32_t& z) noexcept {
 #ifdef MORTON_USE_BMI
-  detail::morton3d<uint_fast64_t, uint_fast32_t, detail::tag::bmi>::decode(
-      m, x, y, z);
+  decode(m, x, y, z, tag::bmi{});
 #else
-  detail::morton3d<uint_fast64_t, uint_fast32_t,
-                   detail::tag::preshifted_lookup_table>::decode(m, x, y, z);
+  decode(m, x, y, z, tag::preshifted_lookup_table{});
 #endif  // MORTON_USE_BMI
 }
 

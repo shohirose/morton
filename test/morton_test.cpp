@@ -233,16 +233,14 @@ TEST(MortonBugReportTest, IssueNo25Case) {
     const uint_fast32_t yt = 2097055;
     const uint_fast32_t zt = 2097103;
     const uint_fast64_t mt = 9223372036853775807;
-    {
-      const auto m = morton::encode(xt, yt, zt);
-      EXPECT_EQ(m, mt);
-    }
-    {
-      uint_fast32_t x, y, z;
-      morton::decode(mt, x, y, z);
-      EXPECT_EQ(x, xt);
-      EXPECT_EQ(y, yt);
-      EXPECT_EQ(z, zt);
-    }
+
+    const auto m = morton::encode(xt, yt, zt);
+    EXPECT_EQ(m, mt);
+
+    uint_fast32_t x, y, z;
+    morton::decode(mt, x, y, z);
+    EXPECT_EQ(x, xt);
+    EXPECT_EQ(y, yt);
+    EXPECT_EQ(z, zt);
   }
 }

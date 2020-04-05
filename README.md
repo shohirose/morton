@@ -29,8 +29,8 @@ uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y, const uint_fa
 uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y, const uint_fast32_t z);
 
 // 32/64 bits decoding in three dimensions.
-void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, const uint_fast16_t z);
-void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, const uint_fast32_t z);
+void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, uint_fast16_t& z);
+void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, uint_fast32_t& z);
 
 }
 ```
@@ -64,9 +64,9 @@ uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y, const uint_fa
 
 // 32/64 bits decoding in three dimensions.
 template <typename Tag>
-void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, const uint_fast16_t z, Tag tag);
+void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y, uint_fast16_t& z, Tag tag);
 template <typename Tag>
-void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, const uint_fast32_t z, Tag tag);
+void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y, uint_fast32_t& z, Tag tag);
 
 }
 ```

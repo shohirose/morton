@@ -1,3 +1,8 @@
+// This software is released under the MIT license.
+//
+// Copyright (c) 2016 Jeroen Baert
+// Copyright (c) 2020 Sho Hirose
+
 #include "morton/morton.hpp"
 
 #include <gtest/gtest.h>

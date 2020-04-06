@@ -11,6 +11,7 @@
 #endif
 
 #include <cstdint>
+#include <type_traits>
 
 /// Moton namespace
 namespace morton {
@@ -28,6 +29,13 @@ struct lookup_table {};
 struct bmi {};
 
 }  // namespace tag
+
+template <typename Tag>
+struct is_tag : std::conditional<
+                    (std::is_same<Tag, tag::bmi>::value ||
+                     std::is_same<Tag, tag::preshifted_lookup_table>::value ||
+                     std::is_same<Tag, tag::lookup_table>::value),
+                    std::true_type, std::false_type>::type {};
 
 /// Detail implementation of morton library
 namespace detail {
@@ -550,6 +558,7 @@ inline void morton2d<MortonCode, Coordinate, tag::bmi>::decode(  //
 template <typename Tag>
 inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
                             Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   return detail::morton2d<uint_fast32_t, uint_fast16_t, Tag>::encode(x, y);
 }
 
@@ -561,6 +570,7 @@ inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
 template <typename Tag>
 inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
                             Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   return detail::morton2d<uint_fast64_t, uint_fast32_t, Tag>::encode(x, y);
 }
 
@@ -598,6 +608,7 @@ inline uint_fast64_t encode(const uint_fast32_t x,
 template <typename Tag>
 inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
                    Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   detail::morton2d<uint_fast32_t, uint_fast16_t, Tag>::decode(m, x, y);
 }
 
@@ -609,6 +620,7 @@ inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
 template <typename Tag>
 inline void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y,
                    Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   detail::morton2d<uint_fast64_t, uint_fast32_t, Tag>::decode(m, x, y);
 }
 
@@ -855,6 +867,7 @@ inline void morton3d<MortonCode, Coordinate, tag::bmi>::decode(
 template <typename Tag>
 inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
                             const uint_fast16_t z, Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   return detail::morton3d<uint_fast32_t, uint_fast16_t, Tag>::encode(x, y, z);
 }
 
@@ -867,6 +880,7 @@ inline uint_fast32_t encode(const uint_fast16_t x, const uint_fast16_t y,
 template <typename Tag>
 inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
                             const uint_fast32_t z, Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   return detail::morton3d<uint_fast64_t, uint_fast32_t, Tag>::encode(x, y, z);
 }
 
@@ -907,6 +921,7 @@ inline uint_fast64_t encode(const uint_fast32_t x, const uint_fast32_t y,
 template <typename Tag>
 inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
                    uint_fast16_t& z, Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   detail::morton3d<uint_fast32_t, uint_fast16_t, Tag>::decode(m, x, y, z);
 }
 
@@ -919,6 +934,7 @@ inline void decode(const uint_fast32_t m, uint_fast16_t& x, uint_fast16_t& y,
 template <typename Tag>
 inline void decode(const uint_fast64_t m, uint_fast32_t& x, uint_fast32_t& y,
                    uint_fast32_t& z, Tag) noexcept {
+  static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   detail::morton3d<uint_fast64_t, uint_fast32_t, Tag>::decode(m, x, y, z);
 }
 

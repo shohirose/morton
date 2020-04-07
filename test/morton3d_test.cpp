@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
+
 using namespace morton3d;
 
 class Morton3d32BitTest : public ::testing::Test {
@@ -71,6 +73,20 @@ TEST_F(Morton3d32BitTest, EncodingUsingLookupTable) {
   }
 }
 
+TEST_F(Morton3d32BitTest, EncodingUsingMagicBits) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const auto m =
+            encode(coordinates32_t{x_[k], y_[j], z_[i]}, tag::magic_bits{});
+        EXPECT_EQ(m.value, m_[(i * 4 + j) * 4 + k])
+            << "  x = " << x_[k] << ", y = " << y_[j] << ", z = " << z_[i]
+            << '\n';
+      }
+    }
+  }
+}
+
 TEST_F(Morton3d32BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
@@ -92,6 +108,20 @@ TEST_F(Morton3d32BitTest, DecodingUsingLookupTable) {
       for (int k = 0; k < 4; ++k) {
         const auto l = (i * 4 + j) * 4 + k;
         const auto c = decode(morton_code32_t{m_[l]}, tag::lookup_table{});
+        EXPECT_EQ(c.x, x_[k]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(c.y, y_[j]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(c.z, z_[i]) << "  m = " << m_[l] << '\n';
+      }
+    }
+  }
+}
+
+TEST_F(Morton3d32BitTest, DecodingUsingMagicBits) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const auto l = (i * 4 + j) * 4 + k;
+        const auto c = decode(morton_code32_t{m_[l]}, tag::magic_bits{});
         EXPECT_EQ(c.x, x_[k]) << "  m = " << m_[l] << '\n';
         EXPECT_EQ(c.y, y_[j]) << "  m = " << m_[l] << '\n';
         EXPECT_EQ(c.z, z_[i]) << "  m = " << m_[l] << '\n';
@@ -160,6 +190,19 @@ TEST_F(Morton3d64BitTest, EncodingUsingLookupTable) {
   }
 }
 
+TEST_F(Morton3d64BitTest, EncodingUsingMagicBits) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const coordinates32_t c{x_[k], y_[j], z_[i]};
+        const auto m = encode(c, tag::magic_bits{});
+        EXPECT_EQ(m.value, m_[(i * 4 + j) * 4 + k])
+            << "  coordinates: " << c << '\n';
+      }
+    }
+  }
+}
+
 TEST_F(Morton3d64BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
@@ -192,37 +235,57 @@ TEST_F(Morton3d64BitTest, DecodingUsingLookupTable) {
   }
 }
 
-TEST(MortonBugReportTest, IssueNo25Case) {
-  // 32 Bits
-  {
-    const coordinates16_t c{1971, 1951, 975};
-    const morton_code32_t m{4293967295};
-    EXPECT_EQ(encode(c, tag::preshifted_lookup_table{}), m);
-    EXPECT_EQ(encode(c, tag::lookup_table{}), m);
-#ifdef MORTON3D_USE_BMI
-    EXPECT_EQ(encode(c, tag::bmi{}), m);
-#endif  // MORTON3D_USE_BMI
+TEST_F(Morton3d64BitTest, DecodingUsingMagicBits) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const auto l = (i * 4 + j) * 4 + k;
+        const morton_code64_t m{m_[l]};
+        const coordinates32_t ct{x_[k], y_[j], z_[i]};
+        const auto c = decode(m, tag::magic_bits{});
+        EXPECT_EQ(ct, c) << "  morton code: " << m
+                         << "\n  correct coordinates: " << ct
+                         << "\n  decoded coordinates: " << c << '\n';
+      }
+    }
   }
+}
 
-  // 64 Bits
+TEST(Morton3dEdgeCaseTest, EdgeCase) {
+  // 32 bits
   {
-    const coordinates32_t c{1971, 1951, 975};
-    const morton_code64_t m{4293967295};
+    const coordinates16_t c{(2U << 9) - 1, (2U << 9) - 1, (2U << 9) - 1};
+    const morton_code32_t m{(2UL << 29) - 1};
     EXPECT_EQ(encode(c, tag::preshifted_lookup_table{}), m);
     EXPECT_EQ(encode(c, tag::lookup_table{}), m);
-#ifdef MORTON3D_USE_BMI
-    EXPECT_EQ(encode(c, tag::bmi{}), m);
-#endif  // MORTON3D_USE_BMI
-  }
-
-  // 64 Bits
-  {
-    const coordinates32_t c{2097075, 2097055, 2097103};
-    const morton_code64_t m{9223372036853775807};
-    EXPECT_EQ(encode(c, tag::preshifted_lookup_table{}), m);
-    EXPECT_EQ(encode(c, tag::lookup_table{}), m);
+    EXPECT_EQ(encode(c, tag::magic_bits{}), m);
     EXPECT_EQ(decode(m, tag::preshifted_lookup_table{}), c);
     EXPECT_EQ(decode(m, tag::lookup_table{}), c);
+    EXPECT_EQ(decode(m, tag::magic_bits{}), c);
+#ifdef MORTON3D_USE_BMI
+    EXPECT_EQ(encode(c, tag::bmi{}), m);
+    EXPECT_EQ(decode(m, tag::bmi{}), c);
+#endif  // MORTON3D_USE_BMI
+  }
+
+  {
+    std::cout << (2UL << 9) << std::endl;
+    const coordinates16_t c{(2U << 9), (2U << 9), (2U << 9)};
+    const morton_code32_t m{(2UL << 29)};
+    EXPECT_DEATH(encode(c, tag::preshifted_lookup_table{}), "");
+    EXPECT_DEATH(decode(m, tag::preshifted_lookup_table{}), "");
+  }
+
+  // 64 bits
+  {
+    const coordinates32_t c{(2UL << 20) - 1, (2UL << 20) - 1, (2UL << 20) - 1};
+    const morton_code64_t m{(2ULL << 62) - 1};
+    EXPECT_EQ(encode(c, tag::preshifted_lookup_table{}), m);
+    EXPECT_EQ(encode(c, tag::lookup_table{}), m);
+    EXPECT_EQ(encode(c, tag::magic_bits{}), m);
+    EXPECT_EQ(decode(m, tag::preshifted_lookup_table{}), c);
+    EXPECT_EQ(decode(m, tag::lookup_table{}), c);
+    EXPECT_EQ(decode(m, tag::magic_bits{}), c);
 #ifdef MORTON3D_USE_BMI
     EXPECT_EQ(encode(c, tag::bmi{}), m);
     EXPECT_EQ(decode(m, tag::bmi{}), c);

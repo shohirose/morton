@@ -47,6 +47,16 @@ TEST_F(Morton2d32BitTest, EncodingUsingLookupTable) {
   }
 }
 
+TEST_F(Morton2d32BitTest, EncodingUsingMagicBits) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto m = encode(coordinates16_t{x_[j], y_[i]}, tag::magic_bits{});
+      EXPECT_EQ(m.value, m_[i * 8 + j])
+          << "  x = " << x_[j] << ", y = " << y_[i] << '\n';
+    }
+  }
+}
+
 TEST_F(Morton2d32BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
@@ -64,6 +74,17 @@ TEST_F(Morton2d32BitTest, DecodingUsingLookupTable) {
     for (int j = 0; j < 7; ++j) {
       const auto k = i * 8 + j;
       const auto c = decode(morton_code32_t{m_[k]}, tag::lookup_table{});
+      EXPECT_EQ(c.x, x_[j]) << "  m = " << m_[k] << '\n';
+      EXPECT_EQ(c.y, y_[i]) << "  m = " << m_[k] << '\n';
+    }
+  }
+}
+
+TEST_F(Morton2d32BitTest, DecodingUsingMagicBits) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto k = i * 8 + j;
+      const auto c = decode(morton_code32_t{m_[k]}, tag::magic_bits{});
       EXPECT_EQ(c.x, x_[j]) << "  m = " << m_[k] << '\n';
       EXPECT_EQ(c.y, y_[i]) << "  m = " << m_[k] << '\n';
     }
@@ -108,6 +129,16 @@ TEST_F(Morton2d64BitTest, EncodingUsingLookupTable) {
   }
 }
 
+TEST_F(Morton2d64BitTest, EncodingUsingMagicBits) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto m = encode(coordinates32_t{x_[j], y_[i]}, tag::magic_bits{});
+      EXPECT_EQ(m.value, m_[i * 8 + j])
+          << "  x = " << x_[j] << ", y = " << y_[i] << '\n';
+    }
+  }
+}
+
 TEST_F(Morton2d64BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
@@ -125,6 +156,17 @@ TEST_F(Morton2d64BitTest, DecodingUsingLookupTable) {
     for (int j = 0; j < 7; ++j) {
       const auto k = i * 8 + j;
       const auto c = decode(morton_code64_t{m_[k]}, tag::lookup_table{});
+      EXPECT_EQ(c.x, x_[j]) << "  m = " << m_[k] << '\n';
+      EXPECT_EQ(c.y, y_[i]) << "  m = " << m_[k] << '\n';
+    }
+  }
+}
+
+TEST_F(Morton2d64BitTest, DecodingUsingMagicBits) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto k = i * 8 + j;
+      const auto c = decode(morton_code64_t{m_[k]}, tag::magic_bits{});
       EXPECT_EQ(c.x, x_[j]) << "  m = " << m_[k] << '\n';
       EXPECT_EQ(c.y, y_[i]) << "  m = " << m_[k] << '\n';
     }

@@ -6,6 +6,7 @@ This is a modified version of [`libmorton`](https://github.com/Forceflow/libmort
 - Look-up tables
 - Pre-shifted look-up tables
 - BMI instruction sets
+- Magic bits
 
 in `libmorton` are implemented here for self-learning.　Unit tests are created by using [Google Test](https://github.com/google/googletest).
 
@@ -46,6 +47,7 @@ If you want to use a specific encoding/decoding implementation, you can specify 
 - `tag::bmi`: Implementation using BMI instruction sets.
 - `tag::lookup_table`: Implementation using look-up tables.
 - `tag::preshifted_lookup_table`: Implementation using pre-shifted look-up tables.
+- `tag::matic_bits`: Implementation using magic bits
 
 ```cpp
 namespace morton2d {

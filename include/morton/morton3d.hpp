@@ -10,6 +10,8 @@
 #include <immintrin.h>
 #endif
 
+#include <bitset>
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
@@ -29,6 +31,9 @@ struct lookup_table {};
 /// Tag for the implementation using BMI instructions
 struct bmi {};
 
+/// Tag for matic bits implementation
+struct magic_bits {};
+
 }  // namespace tag
 
 /// @brief Check if a given type is a tag.
@@ -37,7 +42,8 @@ template <typename Tag>
 struct is_tag : std::conditional<
                     (std::is_same<Tag, tag::bmi>::value ||
                      std::is_same<Tag, tag::preshifted_lookup_table>::value ||
-                     std::is_same<Tag, tag::lookup_table>::value),
+                     std::is_same<Tag, tag::lookup_table>::value ||
+                     std::is_same<Tag, tag::magic_bits>::value),
                     std::true_type, std::false_type>::type {};
 
 /// @brief Morton code
@@ -538,6 +544,146 @@ inline coordinates<U> morton3d<T, U, tag::bmi>::decode(
 
 #endif  // MORTON3D_USE_BMI
 
+/// @brief Morton code implementation using magic bits for 32 bits morton code.
+/// @tparam MortonCode Morton code
+/// @tparam Coordinate Coordinate
+template <>
+class morton3d<uint_fast32_t, uint_fast16_t, tag::magic_bits> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] c Coordinates
+  /// @returns Moton code
+  static morton_code<uint_fast32_t> encode(
+      const coordinates<uint_fast16_t>& c) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @returns Coordinates
+  static coordinates<uint_fast16_t> decode(
+      const morton_code<uint_fast32_t> m) noexcept;
+
+ private:
+  /// Split by three bits
+  /// @param[in] c Coordinate
+  /// @returns Morton code
+  static uint_fast32_t split_by_3bits(const uint_fast16_t c) noexcept;
+
+  /// Get third bits
+  /// @param[in] m Morton code
+  /// @returns Coordinate
+  static uint_fast16_t get_third_bits(const uint_fast32_t m) noexcept;
+};
+
+inline morton_code<uint_fast32_t>
+morton3d<uint_fast32_t, uint_fast16_t, tag::magic_bits>::encode(
+    const coordinates<uint_fast16_t>& c) noexcept {
+  return morton_code<uint_fast32_t>{split_by_3bits(c.x) |
+                                    (split_by_3bits(c.y) << 1) |
+                                    (split_by_3bits(c.z) << 2)};
+}
+
+inline coordinates<uint_fast16_t>
+morton3d<uint_fast32_t, uint_fast16_t, tag::magic_bits>::decode(
+    const morton_code<uint_fast32_t> m) noexcept {
+  return {get_third_bits(m.value), get_third_bits(m.value >> 1),
+          get_third_bits(m.value >> 2)};
+}
+
+inline uint_fast32_t
+morton3d<uint_fast32_t, uint_fast16_t, tag::magic_bits>::split_by_3bits(
+    const uint_fast16_t c) noexcept {
+  uint_fast32_t x = c;
+  x &= 0x00000fff;
+  x = (x | x << 16) & 0xff0000ff;
+  x = (x | x << 8) & 0x0f00f00f;
+  x = (x | x << 4) & 0xc30c30c3;
+  x = (x | x << 2) & 0x49249249;
+  return x;
+}
+
+inline uint_fast16_t
+morton3d<uint_fast32_t, uint_fast16_t, tag::magic_bits>::get_third_bits(
+    const uint_fast32_t m) noexcept {
+  uint_fast32_t x = m;
+  x &= 0x49249249;
+  x = (x ^ (x >> 2)) & 0xc30c30c3;
+  x = (x ^ (x >> 4)) & 0x0f00f00f;
+  x = (x ^ (x >> 8)) & 0xff0000ff;
+  x = (x ^ (x >> 16)) & 0x00000fff;
+  return static_cast<uint_fast16_t>(x);
+}
+
+/// @brief Morton code implementation using magic bits for 64 bits morton code.
+/// @tparam MortonCode Morton code
+/// @tparam Coordinate Coordinate
+template <>
+class morton3d<uint_fast64_t, uint_fast32_t, tag::magic_bits> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] c Coordinates
+  /// @returns Moton code
+  static morton_code<uint_fast64_t> encode(
+      const coordinates<uint_fast32_t>& c) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @returns Coordinates
+  static coordinates<uint_fast32_t> decode(
+      const morton_code<uint_fast64_t> m) noexcept;
+
+ private:
+  /// Split by three bits
+  /// @param[in] c Coordinate
+  /// @returns Morton code
+  static uint_fast64_t split_by_3bits(const uint_fast32_t c) noexcept;
+
+  /// Get third bits
+  /// @param[in] m Morton code
+  /// @returns Coordinate
+  static uint_fast32_t get_third_bits(const uint_fast64_t m) noexcept;
+};
+
+inline morton_code<uint_fast64_t>
+morton3d<uint_fast64_t, uint_fast32_t, tag::magic_bits>::encode(
+    const coordinates<uint_fast32_t>& c) noexcept {
+  return morton_code<uint_fast64_t>{split_by_3bits(c.x) |
+                                    (split_by_3bits(c.y) << 1) |
+                                    (split_by_3bits(c.z) << 2)};
+}
+
+inline coordinates<uint_fast32_t>
+morton3d<uint_fast64_t, uint_fast32_t, tag::magic_bits>::decode(
+    const morton_code<uint_fast64_t> m) noexcept {
+  return {get_third_bits(m.value), get_third_bits(m.value >> 1),
+          get_third_bits(m.value >> 2)};
+}
+
+inline uint_fast64_t
+morton3d<uint_fast64_t, uint_fast32_t, tag::magic_bits>::split_by_3bits(
+    const uint_fast32_t c) noexcept {
+  uint_fast64_t x = c;
+  x &= 0x1fffff;
+  x = (x | x << 32) & 0x1f00000000ffff;
+  x = (x | x << 16) & 0x1f0000ff0000ff;
+  x = (x | x << 8) & 0x100f00f00f00f00f;
+  x = (x | x << 4) & 0x10c30c30c30c30c3;
+  x = (x | x << 2) & 0x1249249249249249;
+  return x;
+}
+
+inline uint_fast32_t
+morton3d<uint_fast64_t, uint_fast32_t, tag::magic_bits>::get_third_bits(
+    const uint_fast64_t m) noexcept {
+  uint_fast64_t x = m;
+  x &= 0x1249249249249249;
+  x = (x ^ (x >> 2)) & 0x10c30c30c30c30c3;
+  x = (x ^ (x >> 4)) & 0x100f00f00f00f00f;
+  x = (x ^ (x >> 8)) & 0x1f0000ff0000ff;
+  x = (x ^ (x >> 16)) & 0x1f00000000ffff;
+  x = (x ^ (x >> 32)) & 0x1fffff;
+  return static_cast<uint_fast32_t>(x);
+}
+
 }  // namespace detail
 
 /// @brief Encode 3D coordinates into 32-bits morton code
@@ -547,6 +693,12 @@ inline coordinates<U> morton3d<T, U, tag::bmi>::decode(
 template <typename Tag>
 inline morton_code32_t encode(const coordinates16_t& c, Tag) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
+  assert(c.x < (2U << 9) &&
+         "Maximum x coordinate is 2^10 - 1 for 32 bits encoding");
+  assert(c.y < (2U << 9) &&
+         "Maximum y coordinate is 2^10 - 1 for 32 bits encoding");
+  assert(c.z < (2U << 9) &&
+         "Maximum z coordinate is 2^10 - 1 for 32 bits encoding");
   return detail::morton3d<uint_fast32_t, uint_fast16_t, Tag>::encode(c);
 }
 
@@ -557,6 +709,12 @@ inline morton_code32_t encode(const coordinates16_t& c, Tag) noexcept {
 template <typename Tag>
 inline morton_code64_t encode(const coordinates32_t& c, Tag) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
+  assert(c.x < (2UL << 20) &&
+         "Maximum x coordinate is 2^21 - 1 for 64 bits encoding");
+  assert(c.y < (2UL << 20) &&
+         "Maximum y coordinate is 2^21 - 1 for 64 bits encoding");
+  assert(c.z < (2UL << 20) &&
+         "Maximum z coordinate is 2^21 - 1 for 64 bits encoding");
   return detail::morton3d<uint_fast64_t, uint_fast32_t, Tag>::encode(c);
 }
 
@@ -589,6 +747,8 @@ inline morton_code64_t encode(const coordinates32_t& c) noexcept {
 template <typename Tag>
 inline coordinates16_t decode(const morton_code32_t m, Tag) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
+  assert(m.value < (2UL << 29) &&
+         "Maximum morton code is 2^30 - 1 for 32 bits encoding");
   return detail::morton3d<uint_fast32_t, uint_fast16_t, Tag>::decode(m);
 }
 
@@ -599,6 +759,8 @@ inline coordinates16_t decode(const morton_code32_t m, Tag) noexcept {
 template <typename Tag>
 inline coordinates32_t decode(const morton_code64_t m, Tag) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
+  assert(m.value < (2ULL << 62) &&
+         "Maximum morton code is 2^63 - 1 for 64 bits encoding");
   return detail::morton3d<uint_fast64_t, uint_fast32_t, Tag>::decode(m);
 }
 

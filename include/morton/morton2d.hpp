@@ -28,6 +28,9 @@ struct lookup_table {};
 /// Tag for the implementation using BMI instructions
 struct bmi {};
 
+/// Tag for magic-bits implementation
+struct magic_bits {};
+
 }  // namespace tag
 
 /// @brief Check if a given type is a tag.
@@ -36,7 +39,8 @@ template <typename Tag>
 struct is_tag : std::conditional<
                     (std::is_same<Tag, tag::bmi>::value ||
                      std::is_same<Tag, tag::preshifted_lookup_table>::value ||
-                     std::is_same<Tag, tag::lookup_table>::value),
+                     std::is_same<Tag, tag::lookup_table>::value ||
+                     std::is_same<Tag, tag::magic_bits>::value),
                     std::true_type, std::false_type>::type {};
 
 /// @brief Morton code
@@ -418,6 +422,142 @@ inline coordinates<U> morton_impl<T, U, tag::bmi>::decode(
           static_cast<U>(pext(m.value, mask_y))};
 }
 #endif  // MORTON2D_USE_BMI
+
+/// @brief Morton code implementation using magic bits in two dimensions for 32
+/// bits morton codes.
+/// @tparam T Morton code
+/// @tparam Coordinate Coordinate
+template <>
+class morton_impl<uint_fast32_t, uint_fast16_t, tag::magic_bits> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] Coordinates coordinates
+  /// @returns Moton code
+  static morton_code<uint_fast32_t> encode(
+      const coordinates<uint_fast16_t>& c) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @return Coordinates
+  static coordinates<uint_fast16_t> decode(
+      const morton_code<uint_fast32_t> m) noexcept;
+
+ private:
+  /// Helper function for encode
+  /// @param[in] c Coordinate
+  /// @returns Morton code
+  static uint_fast32_t split_by_2bits(const uint_fast16_t c) noexcept;
+
+  /// Helper function for decode
+  /// @param[in] m Morton code
+  /// @returns Coordinate
+  static uint_fast16_t get_second_bits(const uint_fast32_t m) noexcept;
+};
+
+inline morton_code<uint_fast32_t>
+morton_impl<uint_fast32_t, uint_fast16_t, tag::magic_bits>::encode(
+    const coordinates<uint_fast16_t>& c) noexcept {
+  return morton_code<uint_fast32_t>{split_by_2bits(c.x) |
+                                    (split_by_2bits(c.y) << 1)};
+}
+
+inline coordinates<uint_fast16_t>
+morton_impl<uint_fast32_t, uint_fast16_t, tag::magic_bits>::decode(
+    const morton_code<uint_fast32_t> m) noexcept {
+  return {get_second_bits(m.value), get_second_bits(m.value >> 1)};
+}
+
+inline uint_fast32_t
+morton_impl<uint_fast32_t, uint_fast16_t, tag::magic_bits>::split_by_2bits(
+    const uint_fast16_t c) noexcept {
+  uint_fast32_t x = c;
+  x = (x | x << 16) & 0x0000FFFF;
+  x = (x | x << 8) & 0x00FF00FF;
+  x = (x | x << 4) & 0x0F0F0F0F;
+  x = (x | x << 2) & 0x33333333;
+  x = (x | x << 1) & 0x55555555;
+  return x;
+}
+
+inline uint_fast16_t
+morton_impl<uint_fast32_t, uint_fast16_t, tag::magic_bits>::get_second_bits(
+    const uint_fast32_t m) noexcept {
+  uint_fast32_t x = m & 0x55555555;
+  x = (x ^ (x >> 1)) & 0x33333333;
+  x = (x ^ (x >> 2)) & 0x0F0F0F0F;
+  x = (x ^ (x >> 4)) & 0x00FF00FF;
+  x = (x ^ (x >> 8)) & 0x0000FFFF;
+  return static_cast<uint_fast16_t>(x);
+}
+
+/// @brief Morton code implementation using magic bits in two dimensions for 64
+/// bits morton codes.
+/// @tparam T Morton code
+/// @tparam Coordinate Coordinate
+template <>
+class morton_impl<uint_fast64_t, uint_fast32_t, tag::magic_bits> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] Coordinates coordinates
+  /// @returns Moton code
+  static morton_code<uint_fast64_t> encode(
+      const coordinates<uint_fast32_t>& c) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @return Coordinates
+  static coordinates<uint_fast32_t> decode(
+      const morton_code<uint_fast64_t> m) noexcept;
+
+ private:
+  /// Helper function for encode
+  /// @param[in] c Coordinate
+  /// @returns Morton code
+  static uint_fast64_t split_by_2bits(const uint_fast32_t c) noexcept;
+
+  /// Helper function for decode
+  /// @param[in] m Morton code
+  /// @returns Coordinate
+  static uint_fast32_t get_second_bits(const uint_fast64_t m) noexcept;
+};
+
+inline morton_code<uint_fast64_t>
+morton_impl<uint_fast64_t, uint_fast32_t, tag::magic_bits>::encode(
+    const coordinates<uint_fast32_t>& c) noexcept {
+  return morton_code<uint_fast64_t>{split_by_2bits(c.x) |
+                                    (split_by_2bits(c.y) << 1)};
+}
+
+inline coordinates<uint_fast32_t>
+morton_impl<uint_fast64_t, uint_fast32_t, tag::magic_bits>::decode(
+    const morton_code<uint_fast64_t> m) noexcept {
+  return {get_second_bits(m.value), get_second_bits(m.value >> 1)};
+}
+
+inline uint_fast64_t
+morton_impl<uint_fast64_t, uint_fast32_t, tag::magic_bits>::split_by_2bits(
+    const uint_fast32_t c) noexcept {
+  uint_fast64_t x = c;
+  x = (x | x << 32) & 0x00000000FFFFFFFF;
+  x = (x | x << 16) & 0x0000FFFF0000FFFF;
+  x = (x | x << 8) & 0x00FF00FF00FF00FF;
+  x = (x | x << 4) & 0x0F0F0F0F0F0F0F0F;
+  x = (x | x << 2) & 0x3333333333333333;
+  x = (x | x << 1) & 0x5555555555555555;
+  return x;
+}
+
+inline uint_fast32_t
+morton_impl<uint_fast64_t, uint_fast32_t, tag::magic_bits>::get_second_bits(
+    const uint_fast64_t m) noexcept {
+  uint_fast64_t x = m & 0x5555555555555555;
+  x = (x ^ (x >> 1)) & 0x3333333333333333;
+  x = (x ^ (x >> 2)) & 0x0F0F0F0F0F0F0F0F;
+  x = (x ^ (x >> 4)) & 0x00FF00FF00FF00FF;
+  x = (x ^ (x >> 8)) & 0x0000FFFF0000FFFF;
+  x = (x ^ (x >> 16)) & 0x00000000FFFFFFFF;
+  return static_cast<uint_fast32_t>(x);
+}
 
 }  // namespace detail
 

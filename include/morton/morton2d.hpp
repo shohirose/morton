@@ -16,7 +16,7 @@
 
 namespace morton2d {
 
-/// Tags for partial specialization of morton_impl and morton3d classes.
+/// Tags for partial specialization of morton_impl and morton2d classes.
 namespace tag {
 
 /// Tag for the implementation using pre-shifted look-up table
@@ -43,6 +43,7 @@ struct is_tag : std::conditional<
 /// @tparam T Value type
 template <typename T>
 struct morton_code {
+  static_assert(std::is_integral<T>::value, "T is not an integral type");
   using value_type = T;
 
   T value;
@@ -77,6 +78,7 @@ std::istream& operator>>(std::istream& is, morton_code<T>& m) {
 /// @tparam T Value type
 template <typename T>
 struct coordinates {
+  static_assert(std::is_integral<T>::value, "T is not an integral type");
   using value_type = T;
 
   T x;  /// X coordinate

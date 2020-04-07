@@ -42,7 +42,9 @@ struct is_tag : std::conditional<
 /// @tparam T Value type
 template <typename T>
 struct morton_code {
+  static_assert(std::is_integral<T>::value, "T is not an integral type");
   using value_type = T;
+
   T value;
 };
 
@@ -75,7 +77,9 @@ std::istream& operator>>(std::istream& is, morton_code<T>& m) {
 /// @tparam T Value type
 template <typename T>
 struct coordinates {
+  static_assert(std::is_integral<T>::value, "T is not an integral type");
   using value_type = T;
+
   T x;  /// X coordinate
   T y;  /// Y coordinate
   T z;  /// Z coordinate
@@ -576,7 +580,7 @@ inline coordinates32_t decode(const morton_code64_t m, Tag) noexcept {
 /// @returns Coordinates
 inline coordinates16_t decode(const morton_code32_t m) noexcept {
 #ifdef MORTON3D_USE_BMI
-  retun decode(m, tag::bmi{});
+  return decode(m, tag::bmi{});
 #else
   return decode(m, tag::preshifted_lookup_table{});
 #endif  // MORTON3D_USE_BMI

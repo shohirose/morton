@@ -1,13 +1,18 @@
 find_package(GTest REQUIRED)
 
-add_executable(morton_test morton_test.cpp)
-target_link_libraries(morton_test
-  PRIVATE
-    morton
-    GTest::GTest
-    GTest::Main
-  )
-add_test(
-  NAME morton_test
-  COMMAND morton_test
-  )
+function(add_unit_test name)
+  add_executable(${name} ${name}.cpp)
+  target_link_libraries(${name}
+    PRIVATE
+      morton
+      GTest::GTest
+      GTest::Main
+    )
+  add_test(
+    NAME ${name}
+    COMMAND ${name}
+    )
+endfunction()
+
+add_unit_test(morton2d_test)
+add_unit_test(morton3d_test)

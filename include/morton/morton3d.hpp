@@ -31,6 +31,8 @@ struct bmi {};
 
 }  // namespace tag
 
+/// @brief Check if a given type is a tag.
+/// @tparam Tag Tag type
 template <typename Tag>
 struct is_tag : std::conditional<
                     (std::is_same<Tag, tag::bmi>::value ||
@@ -46,6 +48,19 @@ struct morton_code {
   using value_type = T;
 
   T value;
+
+  /// @param[in] tvalue Value
+  explicit morton_code(T tvalue) noexcept : value{tvalue} {}
+
+  morton_code() = default;
+  morton_code(const morton_code&) = default;
+  morton_code(morton_code&&) = default;
+
+  morton_code& operator=(const morton_code&) = default;
+  morton_code& operator=(morton_code&&) = default;
+
+  /// @brief Explicit conversion operator
+  explicit operator T() const noexcept { return value; }
 };
 
 /// Morton code in 32 bits
@@ -54,12 +69,12 @@ using morton_code32_t = morton_code<uint_fast32_t>;
 using morton_code64_t = morton_code<uint_fast64_t>;
 
 template <typename T>
-bool operator==(morton_code<T> m1, morton_code<T> m2) noexcept {
+bool operator==(const morton_code<T> m1, const morton_code<T> m2) noexcept {
   return m1.value == m2.value;
 }
 
 template <typename T>
-bool operator!=(morton_code<T> m1, morton_code<T> m2) noexcept {
+bool operator!=(const morton_code<T> m1, const morton_code<T> m2) noexcept {
   return m1.value != m2.value;
 }
 
@@ -73,7 +88,7 @@ std::istream& operator>>(std::istream& is, morton_code<T>& m) {
   return is >> m.value;
 }
 
-/// @brief Coordinates
+/// @brief Coordinates in three dimensions
 /// @tparam T Value type
 template <typename T>
 struct coordinates {
@@ -83,6 +98,18 @@ struct coordinates {
   T x;  /// X coordinate
   T y;  /// Y coordinate
   T z;  /// Z coordinate
+
+  /// @param[in] tx X coordinate
+  /// @param[in] ty Y coordinate
+  /// @param[in] tz Z coordinate
+  coordinates(T tx, T ty, T tz) noexcept : x{tx}, y{ty}, z{tz} {}
+
+  coordinates() = default;
+  coordinates(const coordinates&) = default;
+  coordinates(coordinates&&) = default;
+
+  coordinates& operator=(const coordinates&) = default;
+  coordinates& operator=(coordinates&&) = default;
 };
 
 /// Coordinates in 16 bits

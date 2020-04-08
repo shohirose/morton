@@ -12,7 +12,7 @@ in `libmorton` are implemented here for self-learning.　Unit tests are created 
 
 ## Usage
 
-Please include `morton/morton.hpp`. If `__BMI2__` or `__AVX2__` macro is defined, `encode`/`decode` functions use BMI instruction sets.
+Please include `morton/morton2d.hpp` or `morton/morton3d.hpp`. If `__BMI2__` or `__AVX2__` macro is defined, `encode`/`decode` functions use BMI instruction sets.
 
 ```cpp
 namespace morton2d {
@@ -47,7 +47,7 @@ If you want to use a specific encoding/decoding implementation, you can specify 
 - `tag::bmi`: Implementation using BMI instruction sets.
 - `tag::lookup_table`: Implementation using look-up tables.
 - `tag::preshifted_lookup_table`: Implementation using pre-shifted look-up tables.
-- `tag::matic_bits`: Implementation using magic bits
+- `tag::magic_bits`: Implementation using magic bits
 
 ```cpp
 namespace morton2d {

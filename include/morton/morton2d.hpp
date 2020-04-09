@@ -114,9 +114,9 @@ struct coordinates {
 };
 
 /// Coordinates in 16 bits
-using coordinates16_t = coordinates<uint_least16_t>;
+using coordinates16_t = coordinates<uint16_t>;
 /// Coordinates in 32 bits
-using coordinates32_t = coordinates<uint_least32_t>;
+using coordinates32_t = coordinates<uint32_t>;
 
 template <typename T>
 bool operator==(const coordinates<T>& c1, const coordinates<T>& c2) noexcept {

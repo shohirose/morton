@@ -436,8 +436,8 @@ inline coordinates<U> morton3d<T, U, tag::preshifted_lookup_table>::decode(
 }
 
 /// @brief Morton code implementation using look-up tables in three dimensions.
-/// @tparam MortonCode Morton code
-/// @tparam Coordinate Coordinate
+/// @tparam T Integral type for morton_code
+/// @tparam U Integral type for coordinates
 template <typename T, typename U>
 class morton3d<T, U, tag::lookup_table> {
  public:
@@ -503,8 +503,8 @@ inline coordinates<U> morton3d<T, U, tag::lookup_table>::decode(
 #ifdef MORTON3D_USE_BMI
 
 /// @brief Morton code implementation using BMI instruction sets.
-/// @tparam MortonCode Morton code
-/// @tparam Coordinate Coordinate
+/// @tparam T Integral type for morton_code
+/// @tparam U Integral type for coordinates
 template <typename T, typename U>
 class morton3d<T, U, tag::bmi> {
  public:
@@ -545,8 +545,6 @@ inline coordinates<U> morton3d<T, U, tag::bmi>::decode(
 #endif  // MORTON3D_USE_BMI
 
 /// @brief Morton code implementation using magic bits for 32 bits morton code.
-/// @tparam MortonCode Morton code
-/// @tparam Coordinate Coordinate
 template <>
 class morton3d<uint_fast32_t, uint_fast16_t, tag::magic_bits> {
  public:
@@ -617,8 +615,6 @@ morton3d<uint_fast32_t, uint_fast16_t, tag::magic_bits>::get_third_bits(
 }
 
 /// @brief Morton code implementation using magic bits for 64 bits morton code.
-/// @tparam MortonCode Morton code
-/// @tparam Coordinate Coordinate
 template <>
 class morton3d<uint_fast64_t, uint_fast32_t, tag::magic_bits> {
  public:

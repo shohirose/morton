@@ -308,13 +308,13 @@ inline coordinates<U> morton_impl<T, U, tag::preshifted_lookup_table>::decode(
 }
 
 /// @brief Morton code implementation using look-up tables in two dimensions.
-/// @tparam T Morton code
-/// @tparam Coordinate Coordinate
+/// @tparam T Integral type for morton_code
+/// @tparam U Integral type for coordinates
 template <typename T, typename U>
 class morton_impl<T, U, tag::lookup_table> {
  public:
   /// @brief Encode coordinates to morton code
-  /// @param[in] Coordinates coordinates
+  /// @param[in] c Coordinates
   /// @returns Moton code
   static morton_code<T> encode(const coordinates<U>& c) noexcept;
 
@@ -425,13 +425,11 @@ inline coordinates<U> morton_impl<T, U, tag::bmi>::decode(
 
 /// @brief Morton code implementation using magic bits in two dimensions for 32
 /// bits morton codes.
-/// @tparam T Morton code
-/// @tparam Coordinate Coordinate
 template <>
 class morton_impl<uint_fast32_t, uint_fast16_t, tag::magic_bits> {
  public:
   /// @brief Encode coordinates to morton code
-  /// @param[in] Coordinates coordinates
+  /// @param[in] c Coordinates
   /// @returns Moton code
   static morton_code<uint_fast32_t> encode(
       const coordinates<uint_fast16_t>& c) noexcept;
@@ -495,13 +493,11 @@ morton_impl<uint_fast32_t, uint_fast16_t, tag::magic_bits>::get_second_bits(
 
 /// @brief Morton code implementation using magic bits in two dimensions for 64
 /// bits morton codes.
-/// @tparam T Morton code
-/// @tparam Coordinate Coordinate
 template <>
 class morton_impl<uint_fast64_t, uint_fast32_t, tag::magic_bits> {
  public:
   /// @brief Encode coordinates to morton code
-  /// @param[in] Coordinates coordinates
+  /// @param[in] c Coordinates
   /// @returns Moton code
   static morton_code<uint_fast64_t> encode(
       const coordinates<uint_fast32_t>& c) noexcept;
@@ -570,7 +566,7 @@ morton_impl<uint_fast64_t, uint_fast32_t, tag::magic_bits>::get_second_bits(
 
 /// @brief Encode 2D coordinates into 32-bits morton code.
 /// @tparam Tag Tag to switch implementation
-/// @param[in] Coordinates Coordinates
+/// @param[in] c Coordinates
 /// @returns Morton code
 template <typename Tag>
 inline morton_code32_t encode(const coordinates16_t& c, Tag) noexcept {
@@ -580,7 +576,7 @@ inline morton_code32_t encode(const coordinates16_t& c, Tag) noexcept {
 
 /// @brief Encode 2D coordinates into 66-bits morton code.
 /// @tparam Tag Tag to switch implementation
-/// @param[in] Coordinates Coordinates
+/// @param[in] c Coordinates
 /// @returns Morton code
 template <typename Tag>
 inline morton_code64_t encode(const coordinates32_t& c, Tag) noexcept {
@@ -589,7 +585,7 @@ inline morton_code64_t encode(const coordinates32_t& c, Tag) noexcept {
 }
 
 /// @brief Encode 2D coordinates into 32-bits morton code.
-/// @param[in] Coordinates Coordinates
+/// @param[in] c Coordinates
 /// @returns Morton code
 inline morton_code32_t encode(const coordinates16_t& c) noexcept {
 #ifdef MORTON2D_USE_BMI
@@ -600,7 +596,7 @@ inline morton_code32_t encode(const coordinates16_t& c) noexcept {
 }
 
 /// @brief Encode 2D coordinates into 64-bits morton code.
-/// @param[in] Coordinates Coordinates
+/// @param[in] c Coordinates
 /// @returns Morton code
 inline morton_code64_t encode(const coordinates32_t& c) noexcept {
 #ifdef MORTON2D_USE_BMI

@@ -3,7 +3,8 @@ language: cpp
 compiler:
   - gcc
   - clang
-install: googletest ninja-build
+install:
+  - sudo apt install googletest ninja-build
 script:
   - mkdir -p build
   - cd build

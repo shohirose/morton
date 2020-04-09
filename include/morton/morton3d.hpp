@@ -502,44 +502,88 @@ inline coordinates<U> morton3d<T, U, tag::lookup_table>::decode(
 
 #ifdef MORTON3D_USE_BMI
 
-/// @brief Morton code implementation using BMI instruction sets.
-/// @tparam T Integral type for morton_code
-/// @tparam U Integral type for coordinates
-template <typename T, typename U>
-class morton3d<T, U, tag::bmi> {
+/// @brief Morton code implementation using BMI instruction sets for 32-bit
+/// morton codes.
+template <>
+class morton3d<uint_fast32_t, uint_fast16_t, tag::bmi> {
  public:
   /// @brief Encode coordinates to morton code
   /// @param[in] c Coordinates
   /// @returns Moton code
-  static morton_code<T> encode(const coordinates<U>& c) noexcept;
+  static morton_code<uint_fast32_t> encode(
+      const coordinates<uint_fast16_t>& c) noexcept;
 
   /// @brief Decode morton code to coordinates
   /// @param[in] m Morton code
   /// @returns Coordinates
-  static coordinates<U> decode(const morton_code<T> m) noexcept;
+  static coordinates<uint_fast16_t> decode(
+      const morton_code<uint_fast32_t> m) noexcept;
 };
 
-template <typename T, typename U>
-inline morton_code<T> morton3d<T, U, tag::bmi>::encode(
-    const coordinates<U>& c) noexcept {
-  T m = 0;
-  constexpr T mask_x = 0x9249249249249249;
-  constexpr T mask_y = 0x2492492492492492;
-  constexpr T mask_z = 0x4924924924924924;
-  m |= pdep(static_cast<T>(x), mask_x) | pdep(static_cast<T>(y), mask_y) |
-       pdep(static_cast<T>(z), mask_z);
-  return m;
+inline morton_code<uint_fast32_t>
+morton3d<uint_fast32_t, uint_fast16_t, tag::bmi>::encode(
+    const coordinates<uint_fast16_t>& c) noexcept {
+  uint_fast32_t m = 0;
+  constexpr uint_fast32_t mask_x = 0x49249249;
+  constexpr uint_fast32_t mask_y = 0x92492492;
+  constexpr uint_fast32_t mask_z = 0x24924924;
+  m |= _pdep_u32(static_cast<uint_fast32_t>(c.x), mask_x) |
+       _pdep_u32(static_cast<uint_fast32_t>(c.y), mask_y) |
+       _pdep_u32(static_cast<uint_fast32_t>(c.z), mask_z);
+  return morton_code<uint_fast32_t>{m};
 }
 
-template <typename T, typename U>
-inline coordinates<U> morton3d<T, U, tag::bmi>::decode(
-    const morton_code<T> m) noexcept {
-  constexpr MortonCode mask_x = 0x9249249249249249;
-  constexpr MortonCode mask_y = 0x2492492492492492;
-  constexpr MortonCode mask_z = 0x4924924924924924;
-  return {static_cast<coord>(pext(m, mask_x)),
-          static_cast<coord>(pext(m, mask_y)),
-          static_cast<coord>(pext(m, mask_z))};
+inline coordinates<uint_fast16_t>
+morton3d<uint_fast32_t, uint_fast16_t, tag::bmi>::decode(
+    const morton_code<uint_fast32_t> m) noexcept {
+  constexpr uint_fast32_t mask_x = 0x49249249;
+  constexpr uint_fast32_t mask_y = 0x92492492;
+  constexpr uint_fast32_t mask_z = 0x24924924;
+  return {static_cast<uint_fast16_t>(_pext_u32(m.value, mask_x)),
+          static_cast<uint_fast16_t>(_pext_u32(m.value, mask_y)),
+          static_cast<uint_fast16_t>(_pext_u32(m.value, mask_z))};
+}
+
+/// @brief Morton code implementation using BMI instruction sets for 64-bit
+/// morton codes.
+template <>
+class morton3d<uint_fast64_t, uint_fast32_t, tag::bmi> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] c Coordinates
+  /// @returns Moton code
+  static morton_code<uint_fast64_t> encode(
+      const coordinates<uint_fast32_t>& c) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @returns Coordinates
+  static coordinates<uint_fast32_t> decode(
+      const morton_code<uint_fast64_t> m) noexcept;
+};
+
+inline morton_code<uint_fast64_t>
+morton3d<uint_fast64_t, uint_fast32_t, tag::bmi>::encode(
+    const coordinates<uint_fast32_t>& c) noexcept {
+  uint_fast64_t m = 0;
+  constexpr uint_fast64_t mask_x = 0x9249249249249249;
+  constexpr uint_fast64_t mask_y = 0x2492492492492492;
+  constexpr uint_fast64_t mask_z = 0x4924924924924924;
+  m |= _pdep_u64(static_cast<uint_fast64_t>(c.x), mask_x) |
+       _pdep_u64(static_cast<uint_fast64_t>(c.y), mask_y) |
+       _pdep_u64(static_cast<uint_fast64_t>(c.z), mask_z);
+  return morton_code<uint_fast_64_t>{m};
+}
+
+inline coordinates<uint_fast32_tU>
+morton3d<uint_fast64_t, uint_fast32_t, tag::bmi>::decode(
+    const morton_code<uint_fast64_t> m) noexcept {
+  constexpr uint_fast64_t mask_x = 0x9249249249249249;
+  constexpr uint_fast64_t mask_y = 0x2492492492492492;
+  constexpr uint_fast64_t mask_z = 0x4924924924924924;
+  return {static_cast<uint_fast32_t>(_pext_u64(m.value, mask_x)),
+          static_cast<uint_fast32_t>(_pext_u64(m.value, mask_y)),
+          static_cast<uint_fast32_t>(_pext_u64(m.value, mask_z))};
 }
 
 #endif  // MORTON3D_USE_BMI

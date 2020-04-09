@@ -4,7 +4,8 @@ compiler:
   - gcc
   - clang
 install:
-  - sudo apt install googletest ninja-build
+  - sudo apt update -y
+  - sudo apt install -y libgtest-dev ninja-build
 script:
   - mkdir -p build
   - cd build

@@ -1,0 +1,12 @@
+dist: bionic
+language: cpp
+compiler:
+  - gcc
+  - clang
+install: googletest ninja-build
+script:
+  - mkdir -p build
+  - cd build
+  - cmake .. -GNinja
+  - ninja
+  - ctest

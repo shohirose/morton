@@ -465,9 +465,6 @@ class morton_impl<uint32_t, uint16_t, tag::magic_bits> {
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint16_t get_second_bits(const uint32_t m) noexcept;
-
-  static constexpr uint32_t mask[5] = {0x0000FFFF, 0x00FF00FF, 0x0F0F0F0F,
-                                       0x33333333, 0x55555555};
 };
 
 inline morton_code<uint32_t>
@@ -487,22 +484,22 @@ inline uint32_t
 morton_impl<uint32_t, uint16_t, tag::magic_bits>::split_by_2bits(
     const uint16_t c) noexcept {
   uint32_t x = c;
-  x = (x | x << 16) & mask[0];
-  x = (x | x << 8) & mask[1];
-  x = (x | x << 4) & mask[2];
-  x = (x | x << 2) & mask[3];
-  x = (x | x << 1) & mask[4];
+  x = (x | x << 16) & 0x0000FFFF;
+  x = (x | x << 8) & 0x00FF00FF;
+  x = (x | x << 4) & 0x0F0F0F0F;
+  x = (x | x << 2) & 0x33333333;
+  x = (x | x << 1) & 0x55555555;
   return x;
 }
 
 inline uint16_t
 morton_impl<uint32_t, uint16_t, tag::magic_bits>::get_second_bits(
     const uint32_t m) noexcept {
-  uint32_t x = m & mask[4];
-  x = (x ^ (x >> 1)) & mask[3];
-  x = (x ^ (x >> 2)) & mask[2];
-  x = (x ^ (x >> 4)) & mask[1];
-  x = (x ^ (x >> 8)) & mask[0];
+  uint32_t x = m & 0x55555555;
+  x = (x ^ (x >> 1)) & 0x33333333;
+  x = (x ^ (x >> 2)) & 0x0F0F0F0F;
+  x = (x ^ (x >> 4)) & 0x00FF00FF;
+  x = (x ^ (x >> 8)) & 0x0000FFFF;
   return static_cast<uint16_t>(x);
 }
 
@@ -531,10 +528,6 @@ class morton_impl<uint64_t, uint32_t, tag::magic_bits> {
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint32_t get_second_bits(const uint64_t m) noexcept;
-
-  static constexpr uint64_t mask[6] = {0x00000000FFFFFFFF, 0x0000FFFF0000FFFF,
-                                       0x00FF00FF00FF00FF, 0x0F0F0F0F0F0F0F0F,
-                                       0x3333333333333333, 0x5555555555555555};
 };
 
 inline morton_code<uint64_t>
@@ -554,24 +547,24 @@ inline uint64_t
 morton_impl<uint64_t, uint32_t, tag::magic_bits>::split_by_2bits(
     const uint32_t c) noexcept {
   uint64_t x = c;
-  x = (x | x << 32) & mask[0];
-  x = (x | x << 16) & mask[1];
-  x = (x | x << 8) & mask[2];
-  x = (x | x << 4) & mask[3];
-  x = (x | x << 2) & mask[4];
-  x = (x | x << 1) & mask[5];
+  x = (x | x << 32) & 0x00000000FFFFFFFF;
+  x = (x | x << 16) & 0x0000FFFF0000FFFF;
+  x = (x | x << 8) & 0x00FF00FF00FF00FF;
+  x = (x | x << 4) & 0x0F0F0F0F0F0F0F0F;
+  x = (x | x << 2) & 0x3333333333333333;
+  x = (x | x << 1) & 0x5555555555555555;
   return x;
 }
 
 inline uint32_t
 morton_impl<uint64_t, uint32_t, tag::magic_bits>::get_second_bits(
     const uint64_t m) noexcept {
-  uint64_t x = m & mask[5];
-  x = (x ^ (x >> 1)) & mask[4];
-  x = (x ^ (x >> 2)) & mask[3];
-  x = (x ^ (x >> 4)) & mask[2];
-  x = (x ^ (x >> 8)) & mask[1];
-  x = (x ^ (x >> 16)) & mask[0];
+  uint64_t x = m & 0x5555555555555555;
+  x = (x ^ (x >> 1)) & 0x3333333333333333;
+  x = (x ^ (x >> 2)) & 0x0F0F0F0F0F0F0F0F;
+  x = (x ^ (x >> 4)) & 0x00FF00FF00FF00FF;
+  x = (x ^ (x >> 8)) & 0x0000FFFF0000FFFF;
+  x = (x ^ (x >> 16)) & 0x00000000FFFFFFFF;
   return static_cast<uint32_t>(x);
 }
 

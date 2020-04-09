@@ -604,9 +604,6 @@ class morton3d<uint32_t, uint16_t, tag::magic_bits> {
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint16_t get_third_bits(const uint32_t m) noexcept;
-
-  static constexpr uint32_t mask[5] = {0x00000fff, 0xff0000ff, 0x0f00f00f,
-                                       0xc30c30c3, 0x49249249};
 };
 
 inline morton_code<uint32_t>
@@ -627,22 +624,22 @@ morton3d<uint32_t, uint16_t, tag::magic_bits>::decode(
 inline uint32_t morton3d<uint32_t, uint16_t, tag::magic_bits>::split_by_3bits(
     const uint16_t c) noexcept {
   uint32_t x = c;
-  x &= mask[0];
-  x = (x | x << 16) & mask[1];
-  x = (x | x << 8) & mask[2];
-  x = (x | x << 4) & mask[3];
-  x = (x | x << 2) & mask[4];
+  x &= 0x00000fff;
+  x = (x | x << 16) & 0xff0000ff;
+  x = (x | x << 8) & 0x0f00f00f;
+  x = (x | x << 4) & 0xc30c30c3;
+  x = (x | x << 2) & 0x49249249;
   return x;
 }
 
 inline uint16_t morton3d<uint32_t, uint16_t, tag::magic_bits>::get_third_bits(
     const uint32_t m) noexcept {
   uint32_t x = m;
-  x &= mask[4];
-  x = (x ^ (x >> 2)) & mask[3];
-  x = (x ^ (x >> 4)) & mask[2];
-  x = (x ^ (x >> 8)) & mask[1];
-  x = (x ^ (x >> 16)) & mask[0];
+  x &= 0x49249249;
+  x = (x ^ (x >> 2)) & 0xc30c30c3;
+  x = (x ^ (x >> 4)) & 0x0f00f00f;
+  x = (x ^ (x >> 8)) & 0xff0000ff;
+  x = (x ^ (x >> 16)) & 0x00000fff;
   return static_cast<uint16_t>(x);
 }
 
@@ -670,10 +667,6 @@ class morton3d<uint64_t, uint32_t, tag::magic_bits> {
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint32_t get_third_bits(const uint64_t m) noexcept;
-
-  static constexpr uint64_t mask[6] = {0x1fffff,           0x1f00000000ffff,
-                                       0x1f0000ff0000ff,   0x100f00f00f00f00f,
-                                       0x10c30c30c30c30c3, 0x1249249249249249};
 };
 
 inline morton_code<uint64_t>
@@ -694,24 +687,24 @@ morton3d<uint64_t, uint32_t, tag::magic_bits>::decode(
 inline uint64_t morton3d<uint64_t, uint32_t, tag::magic_bits>::split_by_3bits(
     const uint32_t c) noexcept {
   uint64_t x = c;
-  x &= mask[0];
-  x = (x | x << 32) & mask[1];
-  x = (x | x << 16) & mask[2];
-  x = (x | x << 8) & mask[3];
-  x = (x | x << 4) & mask[4];
-  x = (x | x << 2) & mask[5];
+  x &= 0x1fffff;
+  x = (x | x << 32) & 0x1f00000000ffff;
+  x = (x | x << 16) & 0x1f0000ff0000ff;
+  x = (x | x << 8) & 0x100f00f00f00f00f;
+  x = (x | x << 4) & 0x10c30c30c30c30c3;
+  x = (x | x << 2) & 0x1249249249249249;
   return x;
 }
 
 inline uint32_t morton3d<uint64_t, uint32_t, tag::magic_bits>::get_third_bits(
     const uint64_t m) noexcept {
   uint64_t x = m;
-  x &= mask[5];
-  x = (x ^ (x >> 2)) & mask[4];
-  x = (x ^ (x >> 4)) & mask[3];
-  x = (x ^ (x >> 8)) & mask[2];
-  x = (x ^ (x >> 16)) & mask[1];
-  x = (x ^ (x >> 32)) & mask[0];
+  x &= 0x1249249249249249;
+  x = (x ^ (x >> 2)) & 0x10c30c30c30c30c3;
+  x = (x ^ (x >> 4)) & 0x100f00f00f00f00f;
+  x = (x ^ (x >> 8)) & 0x1f0000ff0000ff;
+  x = (x ^ (x >> 16)) & 0x1f00000000ffff;
+  x = (x ^ (x >> 32)) & 0x1fffff;
   return static_cast<uint32_t>(x);
 }
 

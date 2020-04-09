@@ -8,4 +8,4 @@ install:
   - sudo apt install -y ninja-build
 script:
   - bash scripts/install-googletest.sh
-  - ctest --build-and-test . build --build-generator Ninja --test-command ctest
+  - ctest --build-and-test . build --build-generator Ninja --test-command ctest -V

@@ -7,4 +7,4 @@ mkdir build
 cd build
 cmake .. -GNinja
 ninja
-ninja install
+sudo ninja install

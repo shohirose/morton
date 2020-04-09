@@ -87,6 +87,22 @@ TEST_F(Morton3d32BitTest, EncodingUsingMagicBits) {
   }
 }
 
+#ifdef MORTON3D_USE_BMI
+TEST_F(Morton3d32BitTest, EncodingUsingBmi) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const auto m =
+            encode(coordinates32_t{x_[k], y_[j], z_[i]}, tag::bmi{});
+        EXPECT_EQ(m.value, m_[(i * 4 + j) * 4 + k])
+            << "  x = " << x_[k] << ", y = " << y_[j] << ", z = " << z_[i]
+            << '\n';
+      }
+    }
+  }
+}
+#endif
+
 TEST_F(Morton3d32BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
@@ -129,6 +145,22 @@ TEST_F(Morton3d32BitTest, DecodingUsingMagicBits) {
     }
   }
 }
+
+#ifdef MORTON3D_USE_BMI
+TEST_F(Morton3d32BitTest, DecodingUsingBmi) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const auto l = (i * 4 + j) * 4 + k;
+        const auto c = decode(morton_code32_t{m_[l]}, tag::bmi{});
+        EXPECT_EQ(c.x, x_[k]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(c.y, y_[j]) << "  m = " << m_[l] << '\n';
+        EXPECT_EQ(c.z, z_[i]) << "  m = " << m_[l] << '\n';
+      }
+    }
+  }
+}
+#endif
 
 class Morton3d64BitTest : public ::testing::Test {
  protected:
@@ -203,6 +235,21 @@ TEST_F(Morton3d64BitTest, EncodingUsingMagicBits) {
   }
 }
 
+#ifdef MORTON3D_USE_BMI
+TEST_F(Morton3d64BitTest, EncodingUsingBmi) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const coordinates32_t c{x_[k], y_[j], z_[i]};
+        const auto m = encode(c, tag::bmi{});
+        EXPECT_EQ(m.value, m_[(i * 4 + j) * 4 + k])
+            << "  coordinates: " << c << '\n';
+      }
+    }
+  }
+}
+#endif
+
 TEST_F(Morton3d64BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
@@ -250,6 +297,24 @@ TEST_F(Morton3d64BitTest, DecodingUsingMagicBits) {
     }
   }
 }
+
+#ifdef MORTON3D_USE_BMI
+TEST_F(Morton3d64BitTest, DecodingUsingBmi) {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        const auto l = (i * 4 + j) * 4 + k;
+        const morton_code64_t m{m_[l]};
+        const coordinates32_t ct{x_[k], y_[j], z_[i]};
+        const auto c = decode(m, tag::bmi{});
+        EXPECT_EQ(ct, c) << "  morton code: " << m
+                         << "\n  correct coordinates: " << ct
+                         << "\n  decoded coordinates: " << c << '\n';
+      }
+    }
+  }
+}
+#endif
 
 TEST(Morton3dEdgeCaseTest, EdgeCase) {
   // 32 bits

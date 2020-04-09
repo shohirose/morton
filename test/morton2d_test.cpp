@@ -57,6 +57,18 @@ TEST_F(Morton2d32BitTest, EncodingUsingMagicBits) {
   }
 }
 
+#ifdef MORTON2D_USE_BMI
+TEST_F(Morton2d32BitTest, EncodingUsingBmi) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto m = encode(coordinates16_t{x_[j], y_[i]}, tag::bmi{});
+      EXPECT_EQ(m.value, m_[i * 8 + j])
+          << "  x = " << x_[j] << ", y = " << y_[i] << '\n';
+    }
+  }
+}
+#endif
+
 TEST_F(Morton2d32BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
@@ -90,6 +102,19 @@ TEST_F(Morton2d32BitTest, DecodingUsingMagicBits) {
     }
   }
 }
+
+#ifdef MORTON2D_USE_BMI
+TEST_F(Morton2d32BitTest, DecodingUsingBmi) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto k = i * 8 + j;
+      const auto c = decode(morton_code32_t{m_[k]}, tag::bmi{});
+      EXPECT_EQ(c.x, x_[j]) << "  m = " << m_[k] << '\n';
+      EXPECT_EQ(c.y, y_[i]) << "  m = " << m_[k] << '\n';
+    }
+  }
+}
+#endif
 
 class Morton2d64BitTest : public ::testing::Test {
  protected:
@@ -139,6 +164,18 @@ TEST_F(Morton2d64BitTest, EncodingUsingMagicBits) {
   }
 }
 
+#ifdef MORTON2D_USE_BMI
+TEST_F(Morton2d64BitTest, EncodingUsingBmi) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto m = encode(coordinates32_t{x_[j], y_[i]}, tag::bmi{});
+      EXPECT_EQ(m.value, m_[i * 8 + j])
+          << "  x = " << x_[j] << ", y = " << y_[i] << '\n';
+    }
+  }
+}
+#endif
+
 TEST_F(Morton2d64BitTest, DecodingUsingPreshiftedLookupTable) {
   for (int i = 0; i < 7; ++i) {
     for (int j = 0; j < 7; ++j) {
@@ -172,3 +209,16 @@ TEST_F(Morton2d64BitTest, DecodingUsingMagicBits) {
     }
   }
 }
+
+#ifdef MORTON2D_USE_BMI
+TEST_F(Morton2d64BitTest, DecodingUsingBmi) {
+  for (int i = 0; i < 7; ++i) {
+    for (int j = 0; j < 7; ++j) {
+      const auto k = i * 8 + j;
+      const auto c = decode(morton_code64_t{m_[k]}, tag::bmi{});
+      EXPECT_EQ(c.x, x_[j]) << "  m = " << m_[k] << '\n';
+      EXPECT_EQ(c.y, y_[i]) << "  m = " << m_[k] << '\n';
+    }
+  }
+}
+#endif

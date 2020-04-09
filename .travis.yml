@@ -5,10 +5,10 @@ compiler:
   - clang
 install:
   - sudo apt update -y
-  - sudo apt install -y libgtest-dev ninja-build
+  - sudo apt install -y googletest ninja-build
 script:
   - mkdir -p build
   - cd build
-  - cmake .. -GNinja
+  - cmake .. -GNinja -DGTEST_ROOT=/usr/local
   - ninja
   - ctest

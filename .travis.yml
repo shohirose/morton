@@ -7,8 +7,6 @@ install:
   - sudo apt update -y
   - sudo apt install -y googletest ninja-build
 script:
-  - mkdir -p build
-  - cd build
-  - cmake .. -GNinja -DGTEST_ROOT=/usr/local
-  - ninja
+  - bash scripts/install-googletest.sh
+  - bash scripts/build-morton.sh
   - ctest

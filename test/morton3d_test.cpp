@@ -13,10 +13,10 @@ using namespace morton3d;
 
 class Morton3d32BitTest : public ::testing::Test {
  protected:
-  const uint_fast16_t x_[4] = {0, 1, 2, 3};
-  const uint_fast16_t y_[4] = {0, 1, 2, 3};
-  const uint_fast16_t z_[4] = {0, 1, 2, 3};
-  const uint_fast32_t m_[64] = {
+  const uint16_t x_[4] = {0, 1, 2, 3};
+  const uint16_t y_[4] = {0, 1, 2, 3};
+  const uint16_t z_[4] = {0, 1, 2, 3};
+  const uint32_t m_[64] = {
       // x = 0, 1, 2, 3
 
       // z = 0
@@ -132,10 +132,10 @@ TEST_F(Morton3d32BitTest, DecodingUsingMagicBits) {
 
 class Morton3d64BitTest : public ::testing::Test {
  protected:
-  const uint_fast32_t x_[4] = {0, 1, 2, 3};
-  const uint_fast32_t y_[4] = {0, 1, 2, 3};
-  const uint_fast32_t z_[4] = {0, 1, 2, 3};
-  const uint_fast64_t m_[64] = {
+  const uint32_t x_[4] = {0, 1, 2, 3};
+  const uint32_t y_[4] = {0, 1, 2, 3};
+  const uint32_t z_[4] = {0, 1, 2, 3};
+  const uint64_t m_[64] = {
       // x = 0, 1, 2, 3
 
       // z = 0

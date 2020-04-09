@@ -11,9 +11,9 @@ using namespace morton2d;
 
 class Morton2d32BitTest : public ::testing::Test {
  protected:
-  const uint_fast16_t x_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_fast16_t y_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_fast32_t m_[64] = {
+  const uint16_t x_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint16_t y_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint32_t m_[64] = {
       // x = 0, 1, ..., 7
       0,  1,  4,  5,  16, 17, 20, 21,  // y = 0
       2,  3,  6,  7,  18, 19, 22, 23,  //
@@ -93,9 +93,9 @@ TEST_F(Morton2d32BitTest, DecodingUsingMagicBits) {
 
 class Morton2d64BitTest : public ::testing::Test {
  protected:
-  const uint_fast32_t x_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_fast32_t y_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-  const uint_fast64_t m_[64] = {
+  const uint32_t x_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint32_t y_[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+  const uint64_t m_[64] = {
       // x = 0, 1, ..., 7
       0,  1,  4,  5,  16, 17, 20, 21,  // y = 0
       2,  3,  6,  7,  18, 19, 22, 23,  //

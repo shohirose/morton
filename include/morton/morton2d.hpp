@@ -370,57 +370,82 @@ inline coordinates<U> morton_impl<T, U, tag::lookup_table>::decode(  //
 
 #ifdef MORTON2D_USE_BMI
 
-inline uint32_t pdep(uint32_t source, uint32_t mask) noexcept {
-  return _pdep_u32(source, mask);
-}
-
-inline uint64_t pdep(uint64_t source, uint64_t mask) noexcept {
-  return _pdep_u64(source, mask);
-}
-
-inline uint32_t pext(uint32_t source, uint32_t mask) noexcept {
-  return _pext_u32(source, mask);
-}
-
-inline uint64_t pext(uint64_t source, uint64_t mask) noexcept {
-  return _pext_u64(source, mask);
-}
-
-/// @brief Morton code implementation using BMI instruction sets.
-/// @tparam T Integral type for morton_code
-/// @tparam U Integral type for coordinates
-template <typename T, typename U>
-class morton_impl<T, U, tag::bmi> {
+/// @brief Morton code implementation using BMI instruction sets for 32-bit
+/// morton codes.
+template <>
+class morton_impl<uint_fast32_t, uint_fast16_t, tag::bmi> {
  public:
   /// @brief Encode coordinates to morton code
   /// @param[in] c Coordinates
   /// @returns Moton code
-  static morton_code<T> encode(const coordinates<U>& c) noexcept;
+  static morton_code<uint_fast32_t> encode(
+      const coordinates<uint_fast16_t>& c) noexcept;
 
   /// @brief Decode morton code to coordinates
   /// @param[in] m Morton code
   /// @returns Coordinates
-  static coordinates<U> decode(const morton_code<T> m) noexcept;
+  static coordinates<uint_fast16_t> decode(
+      const morton_code<uint_fast32_t> m) noexcept;
 };
 
-template <typename T, typename U>
-inline morton_code<T> morton_impl<T, U, tag::bmi>::encode(
-    const coordinates<U>& c) noexcept {
-  T m = 0;
-  constexpr T mask_x = 0x5555555555555555;
-  constexpr T mask_y = 0xAAAAAAAAAAAAAAAA;
-  m |= pdep(static_cast<T>(c.x), mask_x) | pdep(static_cast<T>(c.y), mask_y);
-  return morton_code<T>{m};
+inline morton_code<uint_fast32_t>
+morton_impl<uint_fast32_t, uint_fast16_t, tag::bmi>::encode(
+    const coordinates<uint_fast16_t>& c) noexcept {
+  uint_fast32_t m = 0;
+  constexpr uint_fast32_t mask_x = 0x55555555;
+  constexpr uint_fast32_t mask_y = 0xAAAAAAAA;
+  m |= _pdep_u32(static_cast<uint_fast32_t>(c.x), mask_x) |
+       _pdep_u32(static_cast<uint_fast32_t>(c.y), mask_y);
+  return morton_code<uint_fast32_t>{m};
 }
 
-template <typename T, typename U>
-inline coordinates<U> morton_impl<T, U, tag::bmi>::decode(
-    const morton_code<T> m) noexcept {
-  constexpr T mask_x = 0x5555555555555555;
-  constexpr T mask_y = 0xAAAAAAAAAAAAAAAA;
-  return {static_cast<U>(pext(m.value, mask_x)),
-          static_cast<U>(pext(m.value, mask_y))};
+inline coordinates<uint_fast16_t>
+morton_impl<uint_fast32_t, uint_fast16_t, tag::bmi>::decode(
+    const morton_code<uint_fast32_t> m) noexcept {
+  constexpr uint_fast32_t mask_x = 0x55555555;
+  constexpr uint_fast32_t mask_y = 0xAAAAAAAA;
+  return {static_cast<uint_fast16_t>(_pext_u32(m.value, mask_x)),
+          static_cast<uint_fast16_t>(_pext_u32(m.value, mask_y))};
 }
+
+/// @brief Morton code implementation using BMI instruction sets for 64-bit
+/// morton codes.
+template <>
+class morton_impl<uint_fast64_t, uint_fast32_t, tag::bmi> {
+ public:
+  /// @brief Encode coordinates to morton code
+  /// @param[in] c Coordinates
+  /// @returns Moton code
+  static morton_code<uint_fast64_t> encode(
+      const coordinates<uint_fast32_t>& c) noexcept;
+
+  /// @brief Decode morton code to coordinates
+  /// @param[in] m Morton code
+  /// @returns Coordinates
+  static coordinates<uint_fast32_t> decode(
+      const morton_code<uint_fast64_t> m) noexcept;
+};
+
+inline morton_code<uint_fast64_t>
+morton_impl<uint_fast64_t, uint_fast32_t, tag::bmi>::encode(
+    const coordinates<U>& c) noexcept {
+  uint_fast64_t m = 0;
+  constexpr uint_fast64_t mask_x = 0x5555555555555555;
+  constexpr uint_fast64_t mask_y = 0xAAAAAAAAAAAAAAAA;
+  m |= _pdep_u64(static_cast<uint_fast64_t>(c.x), mask_x) |
+       _pdep_u64(static_cast<uint_fast64_t>(c.y), mask_y);
+  return morton_code<uint_fast64_t>{m};
+}
+
+inline coordinates<uint_fast32_t>
+morton_impl<T, uint_fast32_t, tag::bmi>::decode(
+    const morton_code<uint_fast64_t> m) noexcept {
+  constexpr uint_fast64_t mask_x = 0x5555555555555555;
+  constexpr uint_fast64_t mask_y = 0xAAAAAAAAAAAAAAAA;
+  return {static_cast<uint_fast32_t>(_pext_u64(m.value, mask_x)),
+          static_cast<uint_fast32_t>(_pext_u64(m.value, mask_y))};
+}
+
 #endif  // MORTON2D_USE_BMI
 
 /// @brief Morton code implementation using magic bits in two dimensions for 32

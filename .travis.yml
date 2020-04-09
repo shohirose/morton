@@ -5,8 +5,7 @@ compiler:
   - clang
 install:
   - sudo apt update -y
-  - sudo apt install -y googletest ninja-build
+  - sudo apt install -y ninja-build
 script:
   - bash scripts/install-googletest.sh
-  - bash scripts/build-morton.sh
-  - ctest
+  - ctest --build-and-test . build --build-generator Ninja --test-command ctest

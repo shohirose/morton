@@ -25,16 +25,16 @@ If you do not specify a tag, `default_tag` is automatically used. `default_tag` 
 namespace morton2d {
 
 // 32/64 bits encoding in two dimensions.
-template <typename Tag>
-morton_code32_t encode(const coordinates16_t& c, Tag = default_tag{});
-template <typename Tag>
-morton_code64_t encode(const coordiantes32_t& c, Tag = default_tag{});
+template <typename Tag = default_tag>
+morton_code32_t encode(const coordinates16_t& c, Tag = Tag{});
+template <typename Tag = default_tag>
+morton_code64_t encode(const coordiantes32_t& c, Tag = Tag{});
 
 // 32/64 bits decoding in two dimensions.
-template <typename Tag>
-coordinates16_t decode(const morton_code32_t m, Tag = default_tag{});
-template <typename Tag>
-coordiantes32_t decode(const morton_code64_t m, Tag = default_tag{});
+template <typename Tag = default_tag>
+coordinates16_t decode(const morton_code32_t m, Tag = Tag{});
+template <typename Tag = default_tag>
+coordiantes32_t decode(const morton_code64_t m, Tag = Tag{});
 
 } // namespace morton2d
 ```
@@ -43,16 +43,16 @@ coordiantes32_t decode(const morton_code64_t m, Tag = default_tag{});
 namespace morton3d {
 
 // 32/64 bits encoding in three dimensions.
-template <typename Tag>
-morton_code32_t encode(const coordinates16_t& c, Tag = default_tag{});
-template <typename Tag>
-morton_code64_t encode(const coordinates32_t& c, Tag = default_tag{});
+template <typename Tag = default_tag>
+morton_code32_t encode(const coordinates16_t& c, Tag = Tag{});
+template <typename Tag = default_tag>
+morton_code64_t encode(const coordinates32_t& c, Tag = Tag{});
 
 // 32/64 bits decoding in three dimensions.
-template <typename Tag>
-coordinates16_t decode(const morton_code32_t m, Tag = default_tag{});
-template <typename Tag>
-coordinates32_t decode(const morton_code64_t m, Tag = default_tag{});
+template <typename Tag = default_tag>
+coordinates16_t decode(const morton_code32_t m, Tag = Tag{});
+template <typename Tag = default_tag>
+coordinates32_t decode(const morton_code64_t m, Tag = Tag{});
 
 } // namespace morton3d
 ```

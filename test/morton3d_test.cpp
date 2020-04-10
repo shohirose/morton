@@ -333,12 +333,14 @@ TEST(Morton3dEdgeCaseTest, EdgeCase) {
 #endif  // MORTON3D_USE_BMI
   }
 
+#if defined(_DEBUG) || !NDEBUG
   {
     const coordinates16_t c{(1U << 10), (1U << 10), (1U << 10)};
     const morton_code32_t m{(1UL << 30)};
     EXPECT_DEATH(encode(c, tag::preshifted_lookup_table{}), "");
     EXPECT_DEATH(decode(m, tag::preshifted_lookup_table{}), "");
   }
+#endif
 
   // 64 bits
   {

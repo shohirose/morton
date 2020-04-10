@@ -41,7 +41,7 @@ struct magic_bits {};
 using default_tag = tag::bmi;
 #else
 using default_tag = tag::preshifted_lookup_table;
-#endif // MORTON3D_USE_BMI
+#endif  // MORTON3D_USE_BMI
 
 /// @brief Check if a given type is a tag.
 /// @tparam Tag Tag type
@@ -727,8 +727,8 @@ morton3d<uint64_t, uint32_t, tag::magic_bits>::collect_every_third_bit(
 /// @tparam Tag Tag to switch implementations
 /// @param[in] c Coordinates
 /// @returns Morton code
-template <typename Tag>
-inline morton_code32_t encode(const coordinates16_t& c, Tag = default_tag{}) noexcept {
+template <typename Tag = default_tag>
+inline morton_code32_t encode(const coordinates16_t& c, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(c.x < (2U << 9) &&
          "Maximum x coordinate is 2^10 - 1 for 32 bits encoding");
@@ -743,8 +743,8 @@ inline morton_code32_t encode(const coordinates16_t& c, Tag = default_tag{}) noe
 /// @tparam Tag Tag to switch implementations
 /// @param[in] c Coordinates
 /// @returns Morton code
-template <typename Tag>
-inline morton_code64_t encode(const coordinates32_t& c, Tag = default_tag{}) noexcept {
+template <typename Tag = default_tag>
+inline morton_code64_t encode(const coordinates32_t& c, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(c.x < (2UL << 20) &&
          "Maximum x coordinate is 2^21 - 1 for 64 bits encoding");
@@ -759,8 +759,8 @@ inline morton_code64_t encode(const coordinates32_t& c, Tag = default_tag{}) noe
 /// @tparam Tag Tag to switch implementation
 /// @param[in] m Morton code
 /// @returns Coordinates
-template <typename Tag>
-inline coordinates16_t decode(const morton_code32_t m, Tag = default_tag{}) noexcept {
+template <typename Tag = default_tag>
+inline coordinates16_t decode(const morton_code32_t m, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(m.value < (2UL << 29) &&
          "Maximum morton code is 2^30 - 1 for 32 bits encoding");
@@ -771,8 +771,8 @@ inline coordinates16_t decode(const morton_code32_t m, Tag = default_tag{}) noex
 /// @tparam Tag Tag to switch implementation
 /// @param[in] m Morton code
 /// @returns Coordinates
-template <typename Tag>
-inline coordinates32_t decode(const morton_code64_t m, Tag = default_tag{}) noexcept {
+template <typename Tag = default_tag>
+inline coordinates32_t decode(const morton_code64_t m, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(m.value < (2ULL << 62) &&
          "Maximum morton code is 2^63 - 1 for 64 bits encoding");

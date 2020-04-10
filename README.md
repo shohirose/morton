@@ -67,10 +67,6 @@ const auto m = encode(c, tag::preshifted_lookup_table{});
 
 It should be noted that coordinates (`coordiantes16_t`/`coordinates32_t`), morton codes (`morton_code32_t`/`morton_code64_t`), and the aforementioned tags are defined in `morton2d` and `morton3d` namespaces, respectively. Please do not confuse, for example, `morton2d::morton_code32_t` with `morton3d::morton_code32_t`. They are completely different types.
 
-## Testing
-
-`test` directory contains unit tests for the above functions by using Google Test.
-
 ## Build
 
 You can build and test by using [CMake](https://cmake.org/). Type the following commands under the project root directory.
@@ -89,6 +85,14 @@ You can use [Ninja](https://ninja-build.org/) instead of make by typing the foll
 cmake .. -G Ninja   # Configure with Ninja
 ninja               # Build with Ninja
 ```
+
+## Testing
+
+`test` directory contains unit tests for the above functions by using Google Test.
+
+## Benchmarking
+
+`benchmark` directory contains benchmarks with the aid of [Google's benchmark](https://github.com/google/benchmark).
 
 ## Citation
 

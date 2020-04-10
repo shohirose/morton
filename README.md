@@ -61,8 +61,14 @@ Using the above functions, you can do like:
 
 ```cpp
 using namespace morton2d;
+
 const coordinates16_t c(2, 5);
-const auto m = encode(c, tag::preshifted_lookup_table{});
+
+// Default implementation is automatically selected
+const auto m1 = encode(c);
+
+// Explicitly specify an implementation
+const auto m2 = encode(c, tag::preshifted_lookup_table{});
 ```
 
 It should be noted that coordinates (`coordiantes16_t`/`coordinates32_t`), morton codes (`morton_code32_t`/`morton_code64_t`), and the aforementioned tags are defined in both namespaces independently. Please do not confuse, for example, `morton2d::morton_code32_t` with `morton3d::morton_code32_t`. They are completely different types.
@@ -88,11 +94,11 @@ ninja               # Build with Ninja
 
 ## Testing
 
-`test` directory contains unit tests for the above functions by using Google Test.
+`test` directory contains unit tests for the above functions by using Google Test. You can run unit tests by using [CTest](https://cmake.org/cmake/help/latest/manual/ctest.1.html).
 
 ## Benchmarking
 
-`benchmark` directory contains benchmarks with the aid of [Google benchmark](https://github.com/google/benchmark).
+`benchmark` directory contains benchmarks which use [Google benchmark](https://github.com/google/benchmark). Just run executalbes, `morton2d_benchmark` and `morton3d_benchmark`, after building this project by using CMake.
 
 ## Citation
 

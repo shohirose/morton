@@ -5,6 +5,6 @@ tar -xf v1.5.0.tar.gz
 cd benchmark-1.5.0
 mkdir build
 cd build
-cmake .. -GNinja
+cmake .. -GNinja -DBENCHMARK_ENABLE_TESTING=OFF
 ninja
 sudo ninja install

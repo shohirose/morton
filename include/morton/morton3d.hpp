@@ -36,6 +36,13 @@ struct magic_bits {};
 
 }  // namespace tag
 
+/// Default tag
+#ifdef MORTON3D_USE_BMI
+using default_tag = tag::bmi;
+#else
+using default_tag = tag::preshifted_lookup_table;
+#endif // MORTON3D_USE_BMI
+
 /// @brief Check if a given type is a tag.
 /// @tparam Tag Tag type
 template <typename Tag>
@@ -721,7 +728,7 @@ morton3d<uint64_t, uint32_t, tag::magic_bits>::collect_every_third_bit(
 /// @param[in] c Coordinates
 /// @returns Morton code
 template <typename Tag>
-inline morton_code32_t encode(const coordinates16_t& c, Tag) noexcept {
+inline morton_code32_t encode(const coordinates16_t& c, Tag = default_tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(c.x < (2U << 9) &&
          "Maximum x coordinate is 2^10 - 1 for 32 bits encoding");
@@ -737,7 +744,7 @@ inline morton_code32_t encode(const coordinates16_t& c, Tag) noexcept {
 /// @param[in] c Coordinates
 /// @returns Morton code
 template <typename Tag>
-inline morton_code64_t encode(const coordinates32_t& c, Tag) noexcept {
+inline morton_code64_t encode(const coordinates32_t& c, Tag = default_tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(c.x < (2UL << 20) &&
          "Maximum x coordinate is 2^21 - 1 for 64 bits encoding");
@@ -748,34 +755,12 @@ inline morton_code64_t encode(const coordinates32_t& c, Tag) noexcept {
   return detail::morton3d<uint64_t, uint32_t, Tag>::encode(c);
 }
 
-/// @brief Encode 3D coordinates into 32-bits morton code
-/// @param[in] c Coordinates
-/// @returns Morton code
-inline morton_code32_t encode(const coordinates16_t& c) noexcept {
-#ifdef MORTON3D_USE_BMI
-  return encode(c, tag::bmi{});
-#else
-  return encode(c, tag::preshifted_lookup_table{});
-#endif  // MORTON3D_USE_BMI
-}
-
-/// @brief Encode 3D coordinates into 64bits morton code
-/// @param[in] c Coordinates
-/// @returns Morton code
-inline morton_code64_t encode(const coordinates32_t& c) noexcept {
-#ifdef MORTON3D_USE_BMI
-  return encode(c, tag::bmi{});
-#else
-  return encode(c, tag::preshifted_lookup_table{});
-#endif  // MORTON3D_USE_BMI
-}
-
 /// @brief Decode 32-bits morton code into 3D coordinates
 /// @tparam Tag Tag to switch implementation
 /// @param[in] m Morton code
 /// @returns Coordinates
 template <typename Tag>
-inline coordinates16_t decode(const morton_code32_t m, Tag) noexcept {
+inline coordinates16_t decode(const morton_code32_t m, Tag = default_tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(m.value < (2UL << 29) &&
          "Maximum morton code is 2^30 - 1 for 32 bits encoding");
@@ -787,33 +772,11 @@ inline coordinates16_t decode(const morton_code32_t m, Tag) noexcept {
 /// @param[in] m Morton code
 /// @returns Coordinates
 template <typename Tag>
-inline coordinates32_t decode(const morton_code64_t m, Tag) noexcept {
+inline coordinates32_t decode(const morton_code64_t m, Tag = default_tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
   assert(m.value < (2ULL << 62) &&
          "Maximum morton code is 2^63 - 1 for 64 bits encoding");
   return detail::morton3d<uint64_t, uint32_t, Tag>::decode(m);
-}
-
-/// @brief Decode 32-bits morton code into 3D coordinates
-/// @param[in] m Morton code
-/// @returns Coordinates
-inline coordinates16_t decode(const morton_code32_t m) noexcept {
-#ifdef MORTON3D_USE_BMI
-  return decode(m, tag::bmi{});
-#else
-  return decode(m, tag::preshifted_lookup_table{});
-#endif  // MORTON3D_USE_BMI
-}
-
-/// @brief Decode 64-bits morton code into 3D coordinates
-/// @param[in] m Morton code
-/// @returns Coordinates
-inline coordinates32_t decode(const morton_code64_t m) noexcept {
-#ifdef MORTON3D_USE_BMI
-  return decode(m, tag::bmi{});
-#else
-  return decode(m, tag::preshifted_lookup_table{});
-#endif  // MORTON3D_USE_BMI
 }
 
 }  // namespace morton3d

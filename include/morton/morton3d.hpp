@@ -595,12 +595,12 @@ class morton3d<uint32_t, uint16_t, tag::magic_bits> {
   static coordinates<uint16_t> decode(const morton_code<uint32_t> m) noexcept;
 
  private:
-  /// Split by three bits
+  /// @brief Split into every third bit.
   /// @param[in] c Coordinate
   /// @returns Morton code
   static uint32_t split_into_every_third_bit(const uint16_t c) noexcept;
 
-  /// Collect every third bit
+  /// @brief Collect every third bit.
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint16_t collect_every_third_bit(const uint32_t m) noexcept;
@@ -661,12 +661,12 @@ class morton3d<uint64_t, uint32_t, tag::magic_bits> {
   static coordinates<uint32_t> decode(const morton_code<uint64_t> m) noexcept;
 
  private:
-  /// Split by three bits
+  /// @brief Split into every third bit.
   /// @param[in] c Coordinate
   /// @returns Morton code
   static uint64_t split_into_every_third_bit(const uint32_t c) noexcept;
 
-  /// Get third bits
+  /// @brief Collect every third bit.
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint32_t collect_every_third_bit(const uint64_t m) noexcept;

@@ -456,12 +456,12 @@ class morton_impl<uint32_t, uint16_t, tag::magic_bits> {
   static coordinates<uint16_t> decode(const morton_code<uint32_t> m) noexcept;
 
  private:
-  /// Helper function for encode
+  /// @brief Split into every other bit
   /// @param[in] c Coordinate
   /// @returns Morton code
   static uint32_t split_into_every_other_bit(const uint16_t c) noexcept;
 
-  /// Helper function for decode
+  /// @brief Collect every other bit
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint16_t collect_every_other_bit(const uint32_t m) noexcept;
@@ -520,12 +520,12 @@ class morton_impl<uint64_t, uint32_t, tag::magic_bits> {
   static coordinates<uint32_t> decode(const morton_code<uint64_t> m) noexcept;
 
  private:
-  /// Helper function for encode
+  /// @brief Split into every other bit
   /// @param[in] c Coordinate
   /// @returns Morton code
   static uint64_t split_into_every_other_bit(const uint32_t c) noexcept;
 
-  /// Helper function for decode
+  /// @brief Collect every other bit
   /// @param[in] m Morton code
   /// @returns Coordinate
   static uint32_t collect_every_other_bit(const uint64_t m) noexcept;

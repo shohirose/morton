@@ -319,8 +319,8 @@ TEST_F(Morton3d64BitTest, DecodingUsingBmi) {
 TEST(Morton3dEdgeCaseTest, EdgeCase) {
   // 32 bits
   {
-    const coordinates16_t c{(2U << 9) - 1, (2U << 9) - 1, (2U << 9) - 1};
-    const morton_code32_t m{(2UL << 29) - 1};
+    const coordinates16_t c{(1U << 10) - 1, (1U << 10) - 1, (1U << 10) - 1};
+    const morton_code32_t m{(1UL << 30) - 1};
     EXPECT_EQ(encode(c, tag::preshifted_lookup_table{}), m);
     EXPECT_EQ(encode(c, tag::lookup_table{}), m);
     EXPECT_EQ(encode(c, tag::magic_bits{}), m);
@@ -334,17 +334,16 @@ TEST(Morton3dEdgeCaseTest, EdgeCase) {
   }
 
   {
-    std::cout << (2UL << 9) << std::endl;
-    const coordinates16_t c{(2U << 9), (2U << 9), (2U << 9)};
-    const morton_code32_t m{(2UL << 29)};
+    const coordinates16_t c{(1U << 10), (1U << 10), (1U << 10)};
+    const morton_code32_t m{(1UL << 30)};
     EXPECT_DEATH(encode(c, tag::preshifted_lookup_table{}), "");
     EXPECT_DEATH(decode(m, tag::preshifted_lookup_table{}), "");
   }
 
   // 64 bits
   {
-    const coordinates32_t c{(2UL << 20) - 1, (2UL << 20) - 1, (2UL << 20) - 1};
-    const morton_code64_t m{(2ULL << 62) - 1};
+    const coordinates32_t c{(1UL << 21) - 1, (1UL << 21) - 1, (1UL << 21) - 1};
+    const morton_code64_t m{(1ULL << 63) - 1};
     EXPECT_EQ(encode(c, tag::preshifted_lookup_table{}), m);
     EXPECT_EQ(encode(c, tag::lookup_table{}), m);
     EXPECT_EQ(encode(c, tag::magic_bits{}), m);

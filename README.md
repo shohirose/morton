@@ -65,7 +65,7 @@ const coordinates16_t c(2, 5);
 const auto m = encode(c, tag::preshifted_lookup_table{});
 ```
 
-It should be noted that coordinates (`coordiantes16_t`/`coordinates32_t`), morton codes (`morton_code32_t`/`morton_code64_t`), and the aforementioned tags are defined in `morton2d` and `morton3d` namespaces, respectively. Please do not confuse, for example, `morton2d::morton_code32_t` with `morton3d::morton_code32_t`. They are completely different types.
+It should be noted that coordinates (`coordiantes16_t`/`coordinates32_t`), morton codes (`morton_code32_t`/`morton_code64_t`), and the aforementioned tags are defined in both namespaces independently. Please do not confuse, for example, `morton2d::morton_code32_t` with `morton3d::morton_code32_t`. They are completely different types.
 
 ## Build
 
@@ -92,7 +92,7 @@ ninja               # Build with Ninja
 
 ## Benchmarking
 
-`benchmark` directory contains benchmarks with the aid of [Google's benchmark](https://github.com/google/benchmark).
+`benchmark` directory contains benchmarks with the aid of [Google benchmark](https://github.com/google/benchmark).
 
 ## Citation
 

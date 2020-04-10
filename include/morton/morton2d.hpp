@@ -459,29 +459,30 @@ class morton_impl<uint32_t, uint16_t, tag::magic_bits> {
   /// Helper function for encode
   /// @param[in] c Coordinate
   /// @returns Morton code
-  static uint32_t split_by_2bits(const uint16_t c) noexcept;
+  static uint32_t split_into_every_other_bit(const uint16_t c) noexcept;
 
   /// Helper function for decode
   /// @param[in] m Morton code
   /// @returns Coordinate
-  static uint16_t get_second_bits(const uint32_t m) noexcept;
+  static uint16_t collect_every_other_bit(const uint32_t m) noexcept;
 };
 
 inline morton_code<uint32_t>
 morton_impl<uint32_t, uint16_t, tag::magic_bits>::encode(
     const coordinates<uint16_t>& c) noexcept {
-  return morton_code<uint32_t>{split_by_2bits(c.x) |
-                               (split_by_2bits(c.y) << 1)};
+  return morton_code<uint32_t>{split_into_every_other_bit(c.x) |
+                               (split_into_every_other_bit(c.y) << 1)};
 }
 
 inline coordinates<uint16_t>
 morton_impl<uint32_t, uint16_t, tag::magic_bits>::decode(
     const morton_code<uint32_t> m) noexcept {
-  return {get_second_bits(m.value), get_second_bits(m.value >> 1)};
+  return {collect_every_other_bit(m.value),
+          collect_every_other_bit(m.value >> 1)};
 }
 
 inline uint32_t
-morton_impl<uint32_t, uint16_t, tag::magic_bits>::split_by_2bits(
+morton_impl<uint32_t, uint16_t, tag::magic_bits>::split_into_every_other_bit(
     const uint16_t c) noexcept {
   uint32_t x = c;
   x = (x | x << 16) & 0x0000FFFF;
@@ -493,7 +494,7 @@ morton_impl<uint32_t, uint16_t, tag::magic_bits>::split_by_2bits(
 }
 
 inline uint16_t
-morton_impl<uint32_t, uint16_t, tag::magic_bits>::get_second_bits(
+morton_impl<uint32_t, uint16_t, tag::magic_bits>::collect_every_other_bit(
     const uint32_t m) noexcept {
   uint32_t x = m & 0x55555555;
   x = (x ^ (x >> 1)) & 0x33333333;
@@ -522,29 +523,30 @@ class morton_impl<uint64_t, uint32_t, tag::magic_bits> {
   /// Helper function for encode
   /// @param[in] c Coordinate
   /// @returns Morton code
-  static uint64_t split_by_2bits(const uint32_t c) noexcept;
+  static uint64_t split_into_every_other_bit(const uint32_t c) noexcept;
 
   /// Helper function for decode
   /// @param[in] m Morton code
   /// @returns Coordinate
-  static uint32_t get_second_bits(const uint64_t m) noexcept;
+  static uint32_t collect_every_other_bit(const uint64_t m) noexcept;
 };
 
 inline morton_code<uint64_t>
 morton_impl<uint64_t, uint32_t, tag::magic_bits>::encode(
     const coordinates<uint32_t>& c) noexcept {
-  return morton_code<uint64_t>{split_by_2bits(c.x) |
-                               (split_by_2bits(c.y) << 1)};
+  return morton_code<uint64_t>{split_into_every_other_bit(c.x) |
+                               (split_into_every_other_bit(c.y) << 1)};
 }
 
 inline coordinates<uint32_t>
 morton_impl<uint64_t, uint32_t, tag::magic_bits>::decode(
     const morton_code<uint64_t> m) noexcept {
-  return {get_second_bits(m.value), get_second_bits(m.value >> 1)};
+  return {collect_every_other_bit(m.value),
+          collect_every_other_bit(m.value >> 1)};
 }
 
 inline uint64_t
-morton_impl<uint64_t, uint32_t, tag::magic_bits>::split_by_2bits(
+morton_impl<uint64_t, uint32_t, tag::magic_bits>::split_into_every_other_bit(
     const uint32_t c) noexcept {
   uint64_t x = c;
   x = (x | x << 32) & 0x00000000FFFFFFFF;
@@ -557,7 +559,7 @@ morton_impl<uint64_t, uint32_t, tag::magic_bits>::split_by_2bits(
 }
 
 inline uint32_t
-morton_impl<uint64_t, uint32_t, tag::magic_bits>::get_second_bits(
+morton_impl<uint64_t, uint32_t, tag::magic_bits>::collect_every_other_bit(
     const uint64_t m) noexcept {
   uint64_t x = m & 0x5555555555555555;
   x = (x ^ (x >> 1)) & 0x3333333333333333;

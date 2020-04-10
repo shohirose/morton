@@ -598,30 +598,32 @@ class morton3d<uint32_t, uint16_t, tag::magic_bits> {
   /// Split by three bits
   /// @param[in] c Coordinate
   /// @returns Morton code
-  static uint32_t split_by_3bits(const uint16_t c) noexcept;
+  static uint32_t split_into_every_third_bit(const uint16_t c) noexcept;
 
-  /// Get third bits
+  /// Collect every third bit
   /// @param[in] m Morton code
   /// @returns Coordinate
-  static uint16_t get_third_bits(const uint32_t m) noexcept;
+  static uint16_t collect_every_third_bit(const uint32_t m) noexcept;
 };
 
 inline morton_code<uint32_t>
 morton3d<uint32_t, uint16_t, tag::magic_bits>::encode(
     const coordinates<uint16_t>& c) noexcept {
-  return morton_code<uint32_t>{split_by_3bits(c.x) |
-                               (split_by_3bits(c.y) << 1) |
-                               (split_by_3bits(c.z) << 2)};
+  return morton_code<uint32_t>{split_into_every_third_bit(c.x) |
+                               (split_into_every_third_bit(c.y) << 1) |
+                               (split_into_every_third_bit(c.z) << 2)};
 }
 
 inline coordinates<uint16_t>
 morton3d<uint32_t, uint16_t, tag::magic_bits>::decode(
     const morton_code<uint32_t> m) noexcept {
-  return {get_third_bits(m.value), get_third_bits(m.value >> 1),
-          get_third_bits(m.value >> 2)};
+  return {collect_every_third_bit(m.value),
+          collect_every_third_bit(m.value >> 1),
+          collect_every_third_bit(m.value >> 2)};
 }
 
-inline uint32_t morton3d<uint32_t, uint16_t, tag::magic_bits>::split_by_3bits(
+inline uint32_t
+morton3d<uint32_t, uint16_t, tag::magic_bits>::split_into_every_third_bit(
     const uint16_t c) noexcept {
   uint32_t x = c;
   x &= 0x00000fff;
@@ -632,7 +634,8 @@ inline uint32_t morton3d<uint32_t, uint16_t, tag::magic_bits>::split_by_3bits(
   return x;
 }
 
-inline uint16_t morton3d<uint32_t, uint16_t, tag::magic_bits>::get_third_bits(
+inline uint16_t
+morton3d<uint32_t, uint16_t, tag::magic_bits>::collect_every_third_bit(
     const uint32_t m) noexcept {
   uint32_t x = m;
   x &= 0x49249249;
@@ -661,30 +664,32 @@ class morton3d<uint64_t, uint32_t, tag::magic_bits> {
   /// Split by three bits
   /// @param[in] c Coordinate
   /// @returns Morton code
-  static uint64_t split_by_3bits(const uint32_t c) noexcept;
+  static uint64_t split_into_every_third_bit(const uint32_t c) noexcept;
 
   /// Get third bits
   /// @param[in] m Morton code
   /// @returns Coordinate
-  static uint32_t get_third_bits(const uint64_t m) noexcept;
+  static uint32_t collect_every_third_bit(const uint64_t m) noexcept;
 };
 
 inline morton_code<uint64_t>
 morton3d<uint64_t, uint32_t, tag::magic_bits>::encode(
     const coordinates<uint32_t>& c) noexcept {
-  return morton_code<uint64_t>{split_by_3bits(c.x) |
-                               (split_by_3bits(c.y) << 1) |
-                               (split_by_3bits(c.z) << 2)};
+  return morton_code<uint64_t>{split_into_every_third_bit(c.x) |
+                               (split_into_every_third_bit(c.y) << 1) |
+                               (split_into_every_third_bit(c.z) << 2)};
 }
 
 inline coordinates<uint32_t>
 morton3d<uint64_t, uint32_t, tag::magic_bits>::decode(
     const morton_code<uint64_t> m) noexcept {
-  return {get_third_bits(m.value), get_third_bits(m.value >> 1),
-          get_third_bits(m.value >> 2)};
+  return {collect_every_third_bit(m.value),
+          collect_every_third_bit(m.value >> 1),
+          collect_every_third_bit(m.value >> 2)};
 }
 
-inline uint64_t morton3d<uint64_t, uint32_t, tag::magic_bits>::split_by_3bits(
+inline uint64_t
+morton3d<uint64_t, uint32_t, tag::magic_bits>::split_into_every_third_bit(
     const uint32_t c) noexcept {
   uint64_t x = c;
   x &= 0x1fffff;
@@ -696,7 +701,8 @@ inline uint64_t morton3d<uint64_t, uint32_t, tag::magic_bits>::split_by_3bits(
   return x;
 }
 
-inline uint32_t morton3d<uint64_t, uint32_t, tag::magic_bits>::get_third_bits(
+inline uint32_t
+morton3d<uint64_t, uint32_t, tag::magic_bits>::collect_every_third_bit(
     const uint64_t m) noexcept {
   uint64_t x = m;
   x &= 0x1249249249249249;

@@ -430,7 +430,7 @@ inline morton_code<uint64_t> morton_impl<uint64_t, uint32_t, tag::bmi>::encode(
   return morton_code<uint64_t>{m};
 }
 
-inline coordinates<uint32_t> morton_impl<T, uint32_t, tag::bmi>::decode(
+inline coordinates<uint32_t> morton_impl<uint64_t, uint32_t, tag::bmi>::decode(
     const morton_code<uint64_t> m) noexcept {
   constexpr uint64_t mask_x = 0x5555555555555555;
   constexpr uint64_t mask_y = 0xAAAAAAAAAAAAAAAA;

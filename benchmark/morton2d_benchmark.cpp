@@ -8,16 +8,17 @@
 using namespace morton2d;
 
 template <typename T, typename Tag>
-void RunBenchmark(benchmark::State& state) {
+void BM_Morton2dEncoding(benchmark::State& state) {
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
-  std::vector<coordinates<T>> coords(state.range(0));
+  std::uniform_int_distribution<T> dist;
 
   for (auto _ : state) {
     state.PauseTiming();
+    std::vector<coordinates<T>> coords(state.range(0));
     for (auto&& c : coords) {
-      c.x = static_cast<T>(engine());
-      c.y = static_cast<T>(engine());
+      c.x = static_cast<T>(dist(engine));
+      c.y = static_cast<T>(dist(engine));
     }
     state.ResumeTiming();
     for (int i = 0; i < state.range(0); ++i) {
@@ -27,50 +28,24 @@ void RunBenchmark(benchmark::State& state) {
   }
 }
 
-static void BM_32BitEncodingUsingPreshiftedLookupTable(
-    benchmark::State& state) {
-  RunBenchmark<uint16_t, tag::preshifted_lookup_table>(state);
-}
-BENCHMARK(BM_32BitEncodingUsingPreshiftedLookupTable)->Range(8, 8 << 10);
-
-static void BM_32BitEncodingUsingLookupTable(benchmark::State& state) {
-  RunBenchmark<uint16_t, tag::lookup_table>(state);
-}
-BENCHMARK(BM_32BitEncodingUsingLookupTable)->Range(8, 8 << 10);
-
-static void BM_32BitEncodingUsingMagicBits(benchmark::State& state) {
-  RunBenchmark<uint16_t, tag::magic_bits>(state);
-}
-BENCHMARK(BM_32BitEncodingUsingMagicBits)->Range(8, 8 << 10);
-
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint16_t, tag::preshifted_lookup_table)
+    ->Range(8, 8 << 10);
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint16_t, tag::lookup_table)
+    ->Range(8, 8 << 10);
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint16_t, tag::magic_bits)
+    ->Range(8, 8 << 10);
 #ifdef MORTON2D_USE_BMI
-static void BM_32BitEncodingUsingBmi(benchmark::State& state) {
-  RunBenchmark<uint16_t, tag::bmi>(state);
-}
-BENCHMARK(BM_32BitEncodingUsingBmi)->Range(8, 8 << 10);
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint16_t, tag::bmi)->Range(8, 8 << 10);
 #endif  // MORTON2d_USE_BMI
 
-static void BM_64BitEncodingUsingPreshiftedLookupTable(
-    benchmark::State& state) {
-  RunBenchmark<uint32_t, tag::preshifted_lookup_table>(state);
-}
-BENCHMARK(BM_64BitEncodingUsingPreshiftedLookupTable)->Range(8, 8 << 10);
-
-static void BM_64BitEncodingUsingLookupTable(benchmark::State& state) {
-  RunBenchmark<uint32_t, tag::lookup_table>(state);
-}
-BENCHMARK(BM_64BitEncodingUsingLookupTable)->Range(8, 8 << 10);
-
-static void BM_64BitEncodingUsingMagicBits(benchmark::State& state) {
-  RunBenchmark<uint32_t, tag::magic_bits>(state);
-}
-BENCHMARK(BM_64BitEncodingUsingMagicBits)->Range(8, 8 << 10);
-
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint32_t, tag::preshifted_lookup_table)
+    ->Range(8, 8 << 10);
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint32_t, tag::lookup_table)
+    ->Range(8, 8 << 10);
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint32_t, tag::magic_bits)
+    ->Range(8, 8 << 10);
 #ifdef MORTON2D_USE_BMI
-static void BM_64BitEncodingUsingBmi(benchmark::State& state) {
-  RunBenchmark<uint32_t, tag::bmi>(state);
-}
-BENCHMARK(BM_64BitEncodingUsingBmi)->Range(8, 8 << 10);
+BENCHMARK_TEMPLATE(BM_Morton2dEncoding, uint32_t, tag::bmi)->Range(8, 8 << 10);
 #endif  // MORTON2d_USE_BMI
 
 BENCHMARK_MAIN();

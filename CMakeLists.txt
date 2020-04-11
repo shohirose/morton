@@ -28,20 +28,7 @@ target_compile_definitions(morton
     # _USE_MATH_DEFINES : To use M_PI etc.
     $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX _USE_MATH_DEFINES>
   )
-target_sources(morton
-  INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/morton/morton2d.hpp>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/morton/morton3d.hpp>
-  )
-
-# To install header files
-set(HEADER_FIELS
-    include/morton/morton2d.hpp
-    include/morton/morton3d.hpp
-  )
-set_target_properties(morton PROPERTIES
-  PUBLIC_HEADER "${HEADER_FIELS}"
-  )
+add_subdirectory(include)
 
 # Create an alias of morton
 add_library(morton::morton ALIAS morton)
@@ -60,7 +47,6 @@ install(
   TARGETS morton
   EXPORT morton-config
   INCLUDES DESTINATION include
-  PUBLIC_HEADER DESTINATION include/morton
 )
 
 # Install the config file
@@ -68,4 +54,13 @@ install(
   EXPORT morton-config
   NAMESPACE morton::
   DESTINATION lib/cmake/morton
+)
+
+# Install header files
+install(
+  DIRECTORY include/morton/
+  DESTINATION include/morton
+  FILES_MATCHING
+    PATTERN "*.hpp"
+    PATTERN "CMakeLists.txt" EXCLUDE
 )

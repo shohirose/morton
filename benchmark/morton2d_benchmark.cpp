@@ -12,15 +12,13 @@ void BM_Morton2dEncoding(benchmark::State& state) {
   std::random_device seed_gen;
   std::mt19937 engine(seed_gen());
   std::uniform_int_distribution<T> dist;
+  std::vector<coordinates<T>> coords(state.range(0));
+  for (auto&& c : coords) {
+    c.x = dist(engine);
+    c.y = dist(engine);
+  }
 
   for (auto _ : state) {
-    state.PauseTiming();
-    std::vector<coordinates<T>> coords(state.range(0));
-    for (auto&& c : coords) {
-      c.x = static_cast<T>(dist(engine));
-      c.y = static_cast<T>(dist(engine));
-    }
-    state.ResumeTiming();
     for (int i = 0; i < state.range(0); ++i) {
       const auto c = encode(coords[i], Tag{});
       benchmark::DoNotOptimize(c);

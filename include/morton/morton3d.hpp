@@ -728,11 +728,11 @@ morton3d<uint64_t, uint32_t, tag::magic_bits>::collect_every_third_bit(
 template <typename Tag = default_tag>
 inline morton_code32_t encode(const coordinates16_t& c, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
-  assert(c.x < (2U << 9) &&
+  assert(c.x < (1U << 10) &&
          "Maximum x coordinate is 2^10 - 1 for 32 bits encoding");
-  assert(c.y < (2U << 9) &&
+  assert(c.y < (1U << 10) &&
          "Maximum y coordinate is 2^10 - 1 for 32 bits encoding");
-  assert(c.z < (2U << 9) &&
+  assert(c.z < (1U << 10) &&
          "Maximum z coordinate is 2^10 - 1 for 32 bits encoding");
   return detail::morton3d<uint32_t, uint16_t, Tag>::encode(c);
 }
@@ -744,11 +744,11 @@ inline morton_code32_t encode(const coordinates16_t& c, Tag = Tag{}) noexcept {
 template <typename Tag = default_tag>
 inline morton_code64_t encode(const coordinates32_t& c, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
-  assert(c.x < (2UL << 20) &&
+  assert(c.x < (1UL << 21) &&
          "Maximum x coordinate is 2^21 - 1 for 64 bits encoding");
-  assert(c.y < (2UL << 20) &&
+  assert(c.y < (1UL << 21) &&
          "Maximum y coordinate is 2^21 - 1 for 64 bits encoding");
-  assert(c.z < (2UL << 20) &&
+  assert(c.z < (1UL << 21) &&
          "Maximum z coordinate is 2^21 - 1 for 64 bits encoding");
   return detail::morton3d<uint64_t, uint32_t, Tag>::encode(c);
 }
@@ -760,7 +760,7 @@ inline morton_code64_t encode(const coordinates32_t& c, Tag = Tag{}) noexcept {
 template <typename Tag = default_tag>
 inline coordinates16_t decode(const morton_code32_t m, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
-  assert(m.value < (2UL << 29) &&
+  assert(m.value < (1UL << 30) &&
          "Maximum morton code is 2^30 - 1 for 32 bits encoding");
   return detail::morton3d<uint32_t, uint16_t, Tag>::decode(m);
 }
@@ -772,7 +772,7 @@ inline coordinates16_t decode(const morton_code32_t m, Tag = Tag{}) noexcept {
 template <typename Tag = default_tag>
 inline coordinates32_t decode(const morton_code64_t m, Tag = Tag{}) noexcept {
   static_assert(is_tag<Tag>::value, "Tag is not a tag type");
-  assert(m.value < (2ULL << 62) &&
+  assert(m.value < (1ULL << 63) &&
          "Maximum morton code is 2^63 - 1 for 64 bits encoding");
   return detail::morton3d<uint64_t, uint32_t, Tag>::decode(m);
 }

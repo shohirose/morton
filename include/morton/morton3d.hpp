@@ -523,14 +523,16 @@ class morton3d<uint32_t, uint16_t, tag::bmi> {
   /// @param[in] m Morton code
   /// @returns Coordinates
   static coordinates<uint16_t> decode(const morton_code<uint32_t> m) noexcept;
+
+ private:
+  static constexpr uint32_t mask_x = 0x49249249;
+  static constexpr uint32_t mask_y = 0x92492492;
+  static constexpr uint32_t mask_z = 0x24924924;
 };
 
 inline morton_code<uint32_t> morton3d<uint32_t, uint16_t, tag::bmi>::encode(
     const coordinates<uint16_t>& c) noexcept {
   uint32_t m = 0;
-  constexpr uint32_t mask_x = 0x49249249;
-  constexpr uint32_t mask_y = 0x92492492;
-  constexpr uint32_t mask_z = 0x24924924;
   m |= _pdep_u32(static_cast<uint32_t>(c.x), mask_x) |
        _pdep_u32(static_cast<uint32_t>(c.y), mask_y) |
        _pdep_u32(static_cast<uint32_t>(c.z), mask_z);
@@ -539,9 +541,6 @@ inline morton_code<uint32_t> morton3d<uint32_t, uint16_t, tag::bmi>::encode(
 
 inline coordinates<uint16_t> morton3d<uint32_t, uint16_t, tag::bmi>::decode(
     const morton_code<uint32_t> m) noexcept {
-  constexpr uint32_t mask_x = 0x49249249;
-  constexpr uint32_t mask_y = 0x92492492;
-  constexpr uint32_t mask_z = 0x24924924;
   return {static_cast<uint16_t>(_pext_u32(m.value, mask_x)),
           static_cast<uint16_t>(_pext_u32(m.value, mask_y)),
           static_cast<uint16_t>(_pext_u32(m.value, mask_z))};
@@ -561,14 +560,16 @@ class morton3d<uint64_t, uint32_t, tag::bmi> {
   /// @param[in] m Morton code
   /// @returns Coordinates
   static coordinates<uint32_t> decode(const morton_code<uint64_t> m) noexcept;
+
+ private:
+  static constexpr uint64_t mask_x = 0x9249249249249249;
+  static constexpr uint64_t mask_y = 0x2492492492492492;
+  static constexpr uint64_t mask_z = 0x4924924924924924;
 };
 
 inline morton_code<uint64_t> morton3d<uint64_t, uint32_t, tag::bmi>::encode(
     const coordinates<uint32_t>& c) noexcept {
   uint64_t m = 0;
-  constexpr uint64_t mask_x = 0x9249249249249249;
-  constexpr uint64_t mask_y = 0x2492492492492492;
-  constexpr uint64_t mask_z = 0x4924924924924924;
   m |= _pdep_u64(static_cast<uint64_t>(c.x), mask_x) |
        _pdep_u64(static_cast<uint64_t>(c.y), mask_y) |
        _pdep_u64(static_cast<uint64_t>(c.z), mask_z);
@@ -577,9 +578,6 @@ inline morton_code<uint64_t> morton3d<uint64_t, uint32_t, tag::bmi>::encode(
 
 inline coordinates<uint32_tU> morton3d<uint64_t, uint32_t, tag::bmi>::decode(
     const morton_code<uint64_t> m) noexcept {
-  constexpr uint64_t mask_x = 0x9249249249249249;
-  constexpr uint64_t mask_y = 0x2492492492492492;
-  constexpr uint64_t mask_z = 0x4924924924924924;
   return {static_cast<uint32_t>(_pext_u64(m.value, mask_x)),
           static_cast<uint32_t>(_pext_u64(m.value, mask_y)),
           static_cast<uint32_t>(_pext_u64(m.value, mask_z))};

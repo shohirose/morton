@@ -17,16 +17,27 @@ target_compile_features(morton
 target_compile_options(morton
   INTERFACE
     # gcc and clang
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall -Wextra -Wpedantic>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+      -Wall
+      -Wextra
+      -Wpedantic
+      -mavx2
+    >
     # msvc
-    $<$<CXX_COMPILER_ID:MSVC>:/W3>
+    $<$<CXX_COMPILER_ID:MSVC>:
+      /W3
+      /arch:AVX2
+    >
   )
 target_compile_definitions(morton
   INTERFACE
     # For msvc
     # NOMINMAX          : To avoid errors related to std::min/std::max
     # _USE_MATH_DEFINES : To use M_PI etc.
-    $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX _USE_MATH_DEFINES>
+    $<$<CXX_COMPILER_ID:MSVC>:
+      NOMINMAX
+      _USE_MATH_DEFINES
+    >
   )
 add_subdirectory(include)
 

@@ -432,7 +432,7 @@ class morton_impl<uint64_t, uint32_t, tag::bmi> {
 };
 
 inline morton_code<uint64_t> morton_impl<uint64_t, uint32_t, tag::bmi>::encode(
-    const coordinates<U>& c) noexcept {
+    const coordinates<uint32_t>& c) noexcept {
   uint64_t m = 0;
   m |= _pdep_u64(static_cast<uint64_t>(c.x), mask_x) |
        _pdep_u64(static_cast<uint64_t>(c.y), mask_y);

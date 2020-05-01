@@ -573,10 +573,10 @@ inline morton_code<uint64_t> morton3d<uint64_t, uint32_t, tag::bmi>::encode(
   m |= _pdep_u64(static_cast<uint64_t>(c.x), mask_x) |
        _pdep_u64(static_cast<uint64_t>(c.y), mask_y) |
        _pdep_u64(static_cast<uint64_t>(c.z), mask_z);
-  return morton_code<uint_64_t>{m};
+  return morton_code<uint64_t>{m};
 }
 
-inline coordinates<uint32_tU> morton3d<uint64_t, uint32_t, tag::bmi>::decode(
+inline coordinates<uint32_t> morton3d<uint64_t, uint32_t, tag::bmi>::decode(
     const morton_code<uint64_t> m) noexcept {
   return {static_cast<uint32_t>(_pext_u64(m.value, mask_x)),
           static_cast<uint32_t>(_pext_u64(m.value, mask_y)),

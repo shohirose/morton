@@ -21,7 +21,7 @@ target_compile_options(morton
       -Wall
       -Wextra
       -Wpedantic
-      -mavx2
+      -march
     >
     # msvc
     $<$<CXX_COMPILER_ID:MSVC>:
